@@ -43,7 +43,6 @@ const studioSchema = new mongoose.Schema(
 
 // Support the common category/location filters and text searches.
 studioSchema.index({ category: 1, location: 1 });
-studioSchema.index({ title: "text", location: "text", overview: "text" });
 
 module.exports = mongoose.model("Studio", studioSchema);
 module.exports.studioCategories = studioCategories;

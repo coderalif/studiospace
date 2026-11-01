@@ -3,10 +3,9 @@
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, Check, ChevronLeft, ChevronRight, Clock3, MapPin, ShieldCheck, Star, Users, X } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useAuth } from "../../../components/AppProviders";
-import { RequireAuth } from "../../../components/RequireAuth";
 import { api, imageUrl, money, studioId } from "../../../lib/api";
 
 function BookingDialog({ studio, onClose }) {
@@ -28,7 +27,7 @@ function BookingDialog({ studio, onClose }) {
         body: JSON.stringify({ studioId: studioId(studio), startAt: new Date(startAt).toISOString(), endAt: new Date(endAt).toISOString(), guestCount: Number(guestCount) }),
       });
       toast.success(result.message || "Booking request sent to your host.");
-      onClose(true);
+      onClose();
     } catch (error) {
       toast.error(error.message);
     } finally {
@@ -99,13 +98,13 @@ function StudioDetails() {
 
   const ownerId = studio?.owner?._id || studio?.owner;
   const isOwner = user && ownerId && String(user.id || user._id) === String(ownerId);
-  const average = useMemo(() => Number(studio?.rating || 0).toFixed(1), [studio?.rating]);
+  const average = Number(studio?.rating || 0).toFixed(1);
   // Use the uploaded image first, with two gallery images as visual alternatives.
-  const gallery = useMemo(() => studio ? [
+  const gallery = studio ? [
     imageUrl(studio),
     "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1400&q=85",
     "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=1400&q=85",
-  ] : [], [studio]);
+  ] : [];
 
   if (loading) return <div className="page-loading"><span className="spinner" /> Finding the details…</div>;
   if (error || !studio) return <div className="empty-state page-container"><h2>This space is taking a little break.</h2><p>{error || "We couldn't find this studio."}</p><Link className="button button-dark" href="/studios">Back to all studios</Link></div>;
@@ -136,7 +135,7 @@ function StudioDetails() {
         <aside className="booking-card"><div className="booking-price"><strong>${money(studio.hourlyRate)}</strong><span> / hour</span><span className="booking-rating"><Star size={14} fill="currentColor" /> {average}</span></div><div className="booking-card-note"><Check size={16} /> Request a time that works for you</div><div className="booking-card-note"><Check size={16} /> Your host confirms the booking</div>{isOwner ? <Link className="button button-outline booking-cta" href={`/studios/edit/${id}`}>Manage your listing <ArrowRight size={16} /></Link> : <button className="button button-dark booking-cta" onClick={() => user ? setBookingOpen(true) : router.push(`/login?next=${encodeURIComponent(`/studios/${id}`)}`)}>Book this workspace <ArrowRight size={16} /></button>}<p className="booking-safe-note"><ShieldCheck size={14} /> No charge until your host confirms.</p></aside>
       </div>
     </div>
-    {bookingOpen && <RequireAuth><BookingDialog studio={studio} onClose={() => setBookingOpen(false)} /></RequireAuth>}
+    {bookingOpen && <BookingDialog studio={studio} onClose={() => setBookingOpen(false)} />}
   </>;
 }
 

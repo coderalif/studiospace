@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { Toaster } from "sonner";
 import { api } from "../lib/api";
 
@@ -32,15 +32,9 @@ export function AppProviders({ children }) {
     window.localStorage.setItem("studiospace-theme", nextTheme);
   }
 
-  const authValue = useMemo(
-    () => ({ user, setUser, authLoading }),
-    [user, authLoading],
-  );
-  const themeValue = useMemo(() => ({ theme, toggleTheme }), [theme]);
-
   return (
-    <AuthContext.Provider value={authValue}>
-      <ThemeContext.Provider value={themeValue}>
+    <AuthContext.Provider value={{ user, setUser, authLoading }}>
+      <ThemeContext.Provider value={{ theme, toggleTheme }}>
         {children}
         <Toaster position="top-center" richColors closeButton />
       </ThemeContext.Provider>

@@ -17,11 +17,11 @@ const allowedOrigins = (process.env.CLIENT_URL || "http://localhost:3000")
 app.use(
   cors({
     origin(origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-
-      return callback(new Error("This website is not allowed to access the API."));
+      const isAllowed = !origin || allowedOrigins.includes(origin);
+      callback(
+        isAllowed ? null : new Error("This website is not allowed to access the API."),
+        isAllowed,
+      );
     },
     credentials: true,
   }),
