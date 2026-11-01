@@ -10,6 +10,7 @@ export function RequireAuth({ children }) {
   const pathname = usePathname();
 
   useEffect(() => {
+    // Remember the requested page so sign-in can send the guest back to it.
     if (!authLoading && !user) router.replace(`/login?next=${encodeURIComponent(pathname)}`);
   }, [authLoading, user, router, pathname]);
 

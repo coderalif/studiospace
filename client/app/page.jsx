@@ -34,6 +34,7 @@ const slides = [
   },
 ];
 
+// These links preselect the matching category on the studio directory page.
 const categories = [
   { title: "Photo Studios", query: "Photo Studio", icon: Camera, image: "photo-1531058020387-3be344556be6", note: "Find your light" },
   { title: "Sound Stages", query: "Film Stage", icon: Clapperboard, image: "photo-1485846234645-a62644f84728", note: "Big ideas, big screens" },
@@ -50,6 +51,7 @@ export default function HomePage() {
   const [loadError, setLoadError] = useState("");
 
   useEffect(() => {
+    // Keep the home page's featured cards connected to the live studio collection.
     api("/studios/featured")
       .then(({ studios: data }) => setStudios(data))
       .catch((error) => setLoadError(error.message))
@@ -59,6 +61,7 @@ export default function HomePage() {
   return (
     <>
       <section className="hero">
+        {/* Swiper provides the requested autoplaying, clickable home-page slides. */}
         <Swiper
           className="hero-swiper"
           modules={[A11y, Autoplay, EffectFade]}

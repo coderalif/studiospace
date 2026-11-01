@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 
+// Store a password hash, not the password a user typed.
 const userSchema = new mongoose.Schema(
   {
     name: {

@@ -27,6 +27,7 @@ export function StudioCard({ studio }) {
   );
 }
 
+// Keep the card layout visible while the studio request is still in flight.
 export function StudioCardSkeleton() {
   return (
     <div className="studio-card skeleton-card" aria-hidden="true">

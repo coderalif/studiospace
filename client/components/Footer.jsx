@@ -3,6 +3,7 @@ import { Aperture, ArrowUpRight, Instagram, Linkedin } from "lucide-react";
 import { NewsletterForm } from "./NewsletterForm";
 
 export function Footer() {
+  // Keep the same category links and brand details available on every page.
   return (
     <footer className="site-footer">
       <div className="footer-main">

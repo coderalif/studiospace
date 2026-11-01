@@ -3,6 +3,7 @@ function errorHandler(error, req, res, next) {
     return next(error);
   }
 
+  // Turn common database and upload errors into clear, safe API responses.
   if (error.name === "ValidationError") {
     return res.status(400).json({
       message: "Please check the submitted information.",

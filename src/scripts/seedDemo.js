@@ -8,6 +8,8 @@ const User = require("../models/User");
 
 const demoEmail = "examiner@studiospace.local";
 const demoPassword = "StudioSpace2026!";
+
+// Predictable sample listings make the local examiner account useful immediately.
 const sampleStudios = [
   {
     title: "The Sunroom — Natural Light Studio",
@@ -89,6 +91,7 @@ async function seedDemo() {
   }
 
   await connectToDatabase();
+  // Upsert makes the demo setup safe to run again without duplicating listings.
   const passwordHash = await bcrypt.hash(demoPassword, 12);
   const user = await User.findOneAndUpdate(
     { email: demoEmail },

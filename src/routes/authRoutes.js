@@ -12,6 +12,7 @@ const requireAuth = require("../middleware/requireAuth");
 
 const router = Router();
 
+// Keep input checks here so invalid credentials never reach the database.
 function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
@@ -64,6 +65,7 @@ router.post("/register", async (req, res) => {
   });
 });
 
+// A successful password check creates the same cookie session as Google sign-in.
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
@@ -91,6 +93,7 @@ router.post("/google", async (req, res) => {
     return res.status(400).json({ message: "A Google sign-in credential is required." });
   }
 
+  // Verify Google's signed credential on the server before trusting profile details.
   const googleClient = new OAuth2Client(clientId);
   const ticket = await googleClient.verifyIdToken({ idToken: credential, audience: clientId });
   const profile = ticket.getPayload();
@@ -129,6 +132,7 @@ router.get("/me", (req, res, next) => {
     return res.json({ user: null });
   }
 
+  // A visitor without a cookie is a normal signed-out session, not a server error.
   return requireAuth(req, res, (error) => {
     if (error) {
       return next(error);

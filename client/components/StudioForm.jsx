@@ -19,6 +19,7 @@ const blankStudio = {
 };
 
 export function StudioForm({ initialValue = blankStudio, onSubmit, submitLabel }) {
+  // One form handles both creating a fresh listing and editing an existing one.
   const [form, setForm] = useState({
     ...blankStudio,
     ...initialValue,
@@ -51,6 +52,7 @@ export function StudioForm({ initialValue = blankStudio, onSubmit, submitLabel }
       return;
     }
 
+    // Upload first and store the returned hosted URL with the listing fields.
     setUploading(true);
     try {
       const body = new FormData();
@@ -69,6 +71,7 @@ export function StudioForm({ initialValue = blankStudio, onSubmit, submitLabel }
     event.preventDefault();
     setBusy(true);
     try {
+      // Form inputs are strings, but the API stores prices and capacity as numbers.
       await onSubmit({
         ...form,
         hourlyRate: Number(form.hourlyRate),

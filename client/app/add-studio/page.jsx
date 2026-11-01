@@ -12,6 +12,7 @@ export default function AddStudioPage() {
   const router = useRouter();
 
   async function createStudio(values) {
+    // The server attaches the verified host identity to this new listing.
     const result = await api("/studios", { method: "POST", body: JSON.stringify(values) });
     toast.success(result.message || "Your studio listing is live.");
     router.push("/my-listings");

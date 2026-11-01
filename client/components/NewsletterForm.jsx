@@ -4,6 +4,7 @@ import { ArrowUpRight } from "lucide-react";
 import { toast } from "sonner";
 
 export function NewsletterForm() {
+  // Show an honest message until an email/newsletter service is connected.
   function submit(event) {
     event.preventDefault();
     toast.error("Newsletter sign-up will be available when email updates are connected.");

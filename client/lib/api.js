@@ -1,3 +1,4 @@
+// Keep API requests pointed at one configurable origin for both local and hosted setups.
 const API_URL = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api").replace(
   /\/$/,
   "",
@@ -11,6 +12,7 @@ export async function api(path, options = {}) {
     headers.set("Content-Type", "application/json");
   }
 
+  // Cookies are required for the backend's HTTP-only login session.
   const response = await fetch(`${API_URL}${path}`, {
     ...options,
     headers,

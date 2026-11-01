@@ -27,6 +27,7 @@ function LoginForm() {
       const { user } = await api("/auth/login", { method: "POST", body: JSON.stringify({ email, password }) });
       setUser(user);
       toast.success("Welcome back. Your next idea is waiting.");
+      // Protected pages pass their destination as `next`; otherwise return home.
       router.replace(params.get("next") || "/");
     } catch (error) {
       toast.error(error.message);

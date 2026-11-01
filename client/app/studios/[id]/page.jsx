@@ -15,6 +15,7 @@ function BookingDialog({ studio, onClose }) {
   const [guestCount, setGuestCount] = useState(1);
   const [busy, setBusy] = useState(false);
   const minDate = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+  // Show an estimate while the server calculates and validates the real booking.
   const hours = startAt && endAt ? Math.max((new Date(endAt) - new Date(startAt)) / 3600000, 0) : 0;
   const total = Math.round(hours * studio.hourlyRate * 100) / 100;
 
@@ -99,6 +100,7 @@ function StudioDetails() {
   const ownerId = studio?.owner?._id || studio?.owner;
   const isOwner = user && ownerId && String(user.id || user._id) === String(ownerId);
   const average = useMemo(() => Number(studio?.rating || 0).toFixed(1), [studio?.rating]);
+  // Use the uploaded image first, with two gallery images as visual alternatives.
   const gallery = useMemo(() => studio ? [
     imageUrl(studio),
     "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1400&q=85",

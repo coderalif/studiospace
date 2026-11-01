@@ -13,6 +13,7 @@ export function AppProviders({ children }) {
   const [theme, setTheme] = useState("light");
 
   useEffect(() => {
+    // Restore the chosen theme and login session once the browser is ready.
     const savedTheme = window.localStorage.getItem("studiospace-theme");
     const nextTheme = savedTheme || "light";
     setTheme(nextTheme);

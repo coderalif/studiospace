@@ -3,6 +3,8 @@ const multer = require("multer");
 const requireAuth = require("../middleware/requireAuth");
 
 const router = Router();
+
+// Keep uploads in memory only long enough to forward them to the image host.
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 5 * 1024 * 1024, files: 1 },
@@ -25,6 +27,7 @@ router.post("/", requireAuth, upload.single("image"), async (req, res) => {
     return res.status(400).json({ message: "Choose an image to upload." });
   }
 
+  // ImgBB expects the image bytes as base64 in a form-encoded request.
   const form = new URLSearchParams();
   form.set("image", req.file.buffer.toString("base64"));
   const response = await fetch(

@@ -22,6 +22,7 @@ function StudiosContent() {
   const [mobileFilters, setMobileFilters] = useState(false);
 
   useEffect(() => {
+    // Refetch when the guest changes the category, search, or location filters.
     let active = true;
     setLoading(true);
     setError("");
@@ -37,6 +38,7 @@ function StudiosContent() {
     return () => { active = false; };
   }, [category, search, location]);
 
+  // Sorting is local because the filtered result set is already loaded.
   const sortedStudios = [...studios].sort((a, b) => {
     if (sort === "price-low") return a.hourlyRate - b.hourlyRate;
     if (sort === "price-high") return b.hourlyRate - a.hourlyRate;

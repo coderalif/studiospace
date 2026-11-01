@@ -13,6 +13,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" data-scroll-behavior="smooth" suppressHydrationWarning>
       <body>
+        {/* Shared providers, navigation, and footer wrap every route. */}
         <AppProviders>
           <Header />
           <main>{children}</main>

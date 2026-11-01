@@ -22,6 +22,7 @@ function BookingsContent() {
     setLoading(true);
     setError("");
     try {
+      // The dashboard has separate guest and host tabs, so fetch both views together.
       const results = await Promise.all([api("/bookings/mine"), api("/bookings/host")]);
       setBookings(results[0].bookings);
       setHostBookings(results[1].bookings);

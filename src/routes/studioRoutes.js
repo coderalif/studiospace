@@ -7,6 +7,7 @@ const { studioCategories } = require("../models/Studio");
 
 const router = Router();
 
+// Accept only web image URLs; reject other protocols before saving a listing.
 function isHttpURL(value) {
   try {
     const url = new URL(value);
@@ -55,6 +56,7 @@ function studioFields(body = {}) {
     return { error: "Amenities must be a list of text values." };
   }
 
+  // Build a clean allow-list instead of saving arbitrary fields from the request.
   return {
     values: {
       title: title.trim(),
@@ -71,6 +73,7 @@ function studioFields(body = {}) {
 }
 
 router.get("/featured", async (req, res) => {
+  // The home page requests at most six highly rated, recently added spaces.
   const studios = await Studio.find()
     .sort({ rating: -1, createdAt: -1 })
     .limit(6)
@@ -109,6 +112,7 @@ router.get("/", async (req, res) => {
     ];
   }
 
+  // Fetch the requested page and total count together for the results summary.
   const [studios, total] = await Promise.all([
     Studio.find(filter)
       .sort({ createdAt: -1 })
@@ -161,6 +165,7 @@ router.patch("/:id", requireAuth, async (req, res) => {
     return res.status(400).json({ message: result.error });
   }
 
+  // Match both ID and owner so another host cannot edit this listing.
   const studio = await Studio.findOneAndUpdate(
     { _id: req.params.id, owner: req.user._id },
     result.values,
@@ -189,6 +194,7 @@ router.delete("/:id", requireAuth, async (req, res) => {
     });
   }
 
+  // Preserve listings that still have a future request or confirmed reservation.
   const activeBooking = await Booking.exists({
     studio: studio._id,
     status: { $in: ["Pending", "Confirmed"] },
@@ -220,6 +226,7 @@ router.post("/:id/reviews", requireAuth, async (req, res) => {
     return res.status(404).json({ message: "Studio listing not found." });
   }
 
+  // Only someone who completed a stay may leave one review for this studio.
   const completedBooking = await Booking.exists({
     studio: studio._id,
     renter: req.user._id,

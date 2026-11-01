@@ -13,6 +13,7 @@ const allowedOrigins = (process.env.CLIENT_URL || "http://localhost:3000")
   .split(",")
   .map((origin) => origin.trim());
 
+// Allow only configured frontends to send cookie-based requests to the API.
 app.use(
   cors({
     origin(origin, callback) {
@@ -28,10 +29,12 @@ app.use(
 app.use(express.json({ limit: "1mb" }));
 app.use(cookieParser());
 
+// A small endpoint for checking that the API process is responding.
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok", message: "StudioSpace API is running." });
 });
 
+// Keep each feature's routes in a separate file so the app setup stays easy to scan.
 app.use("/api/auth", authRoutes);
 app.use("/api/studios", studioRoutes);
 app.use("/api/bookings", bookingRoutes);

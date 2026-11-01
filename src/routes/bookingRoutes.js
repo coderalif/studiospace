@@ -12,8 +12,8 @@ function validDate(value) {
   return Number.isNaN(date.getTime()) ? null : date;
 }
 
+// Two intervals overlap when each one begins before the other one ends.
 async function findConfirmedOverlap(studioId, startAt, endAt, ignoredBookingId) {
-  // Two time ranges overlap when each one starts before the other one ends.
   const filter = {
     studio: studioId,
     status: "Confirmed",
@@ -56,6 +56,7 @@ router.post("/", async (req, res) => {
     return res.status(400).json({ message: "Guest count exceeds this studio's maximum capacity." });
   }
 
+  // Pending requests do not reserve a time; only confirmed bookings block it.
   const overlap = await findConfirmedOverlap(studio._id, startAt, endAt);
   if (overlap) {
     return res.status(409).json({
@@ -81,6 +82,7 @@ router.post("/", async (req, res) => {
 });
 
 router.get("/host", async (req, res) => {
+  // Hosts see requests only for studios they own.
   const ownedStudios = await Studio.find({ owner: req.user._id }).select("_id");
   const bookings = await Booking.find({ studio: { $in: ownedStudios.map((studio) => studio._id) } })
     .sort({ createdAt: -1 })
@@ -114,6 +116,7 @@ router.patch("/:id/status", async (req, res) => {
   }
 
   const { status } = req.body;
+  // Limit status changes to the booking's next valid step.
   const allowedTransitions = {
     Pending: ["Confirmed", "Cancelled"],
     Confirmed: ["Completed", "Cancelled"],
@@ -157,6 +160,7 @@ router.patch("/:id/cancel", async (req, res) => {
     return res.status(409).json({ message: "Only pending bookings can be cancelled by the guest." });
   }
 
+  // Guests may cancel their own pending request, but not a confirmed booking.
   booking.status = "Cancelled";
   await booking.save();
   return res.json({ message: "Booking cancelled.", booking });

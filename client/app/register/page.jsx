@@ -34,6 +34,7 @@ export default function RegisterPage() {
     if (passwordMessage) return;
     setBusy(true);
     try {
+      // Registration ends at sign-in; the API does not silently log in a new account.
       await api("/auth/register", { method: "POST", body: JSON.stringify(form) });
       toast.success("Your account is ready. Sign in to get started.");
       router.push("/login");

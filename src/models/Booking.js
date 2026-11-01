@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 
+// Snapshot the booking details so the reservation remains readable if a listing changes.
 const bookingSchema = new mongoose.Schema(
   {
     studio: { type: mongoose.Schema.Types.ObjectId, ref: "Studio", required: true },
@@ -19,6 +20,7 @@ const bookingSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
+// Help MongoDB find bookings for a studio and a guest without scanning every record.
 bookingSchema.index({ studio: 1, status: 1, startAt: 1, endAt: 1 });
 bookingSchema.index({ renter: 1, createdAt: -1 });
 

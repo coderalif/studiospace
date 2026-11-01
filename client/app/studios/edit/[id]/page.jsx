@@ -16,6 +16,7 @@ function EditStudioContent() {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    // Load the existing record so the shared form can start with saved values.
     api(`/studios/${id}`)
       .then(({ studio: value }) => setStudio(value))
       .catch((requestError) => setError(requestError.message));

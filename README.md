@@ -24,6 +24,17 @@ StudioSpace is a peer-to-peer marketplace for creative studios and production sp
 - JWT cookies, bcryptjs, Google ID token verification, and ImgBB image hosting.
 - Next.js App Router, React, Swiper carousels, Lucide icons, and Sonner toast notifications.
 
+## Where the code lives
+
+- `src/server.js` starts the API after checking configuration and connecting to MongoDB.
+- `src/models/` defines the account, studio, and booking data stored in MongoDB.
+- `src/routes/` contains the API endpoints for authentication, studios, bookings, and image uploads.
+- `src/middleware/` checks login sessions and returns consistent API errors.
+- `src/scripts/seedDemo.js` adds a local-only examiner account and example studios.
+- `client/app/` contains the website pages and shared responsive theme styles.
+- `client/components/` contains reusable navigation, listing forms, and other interface pieces.
+- `client/lib/` contains the API helper and shared form/category data.
+
 ## Local setup
 
 1. Install Node.js 18+ and make sure MongoDB is available locally or through MongoDB Atlas.

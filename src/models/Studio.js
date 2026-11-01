@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 
+// Keep these choices in sync with the studio form and category filters in the client.
 const studioCategories = [
   "Photo Studio",
   "Film Stage",
@@ -19,6 +20,7 @@ const reviewSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
+// A studio belongs to its host; reviews stay attached to the space they describe.
 const studioSchema = new mongoose.Schema(
   {
     title: { type: String, required: true, trim: true, maxlength: 120 },
@@ -39,6 +41,7 @@ const studioSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
+// Support the common category/location filters and text searches.
 studioSchema.index({ category: 1, location: 1 });
 studioSchema.index({ title: "text", location: "text", overview: "text" });
 

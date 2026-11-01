@@ -1,5 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap");
 
+/* Shared color tokens keep light and dark themes consistent across every route. */
 :root {
   --paper: #fbfaf7;
   --surface: #ffffff;
@@ -46,6 +47,7 @@ em { font-family: "DM Serif Display", Georgia, serif; font-weight: 400; }
 .page-container { width: min(1200px, calc(100% - 72px)); margin-inline: auto; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
 
+/* Site-wide navigation and reusable buttons. */
 .site-header { position: sticky; z-index: 20; top: 0; background: color-mix(in srgb, var(--paper) 93%, transparent); border-bottom: 1px solid color-mix(in srgb, var(--line) 75%, transparent); backdrop-filter: blur(16px); }
 .header-inner { height: 76px; width: min(1360px, calc(100% - 72px)); margin: auto; display: flex; align-items: center; justify-content: space-between; gap: 30px; }
 .brand { display: inline-flex; align-items: center; gap: 9px; font-size: 20px; font-weight: 700; letter-spacing: -1.15px; white-space: nowrap; }
@@ -84,6 +86,7 @@ em { font-family: "DM Serif Display", Georgia, serif; font-weight: 400; }
 .logout-button:hover { color: var(--ink); background: var(--surface-soft); }
 .mobile-logout { display: none; }
 
+/* Home page: image slider, featured studios, categories, and host callout. */
 .hero { position: relative; min-height: 620px; overflow: hidden; color: #fff; background: #343c32; }
 .hero-swiper { position: absolute; z-index: 0; inset: 0; height: 100%; }
 .hero-swiper .swiper-slide { height: 100%; }
@@ -184,6 +187,7 @@ em { font-family: "DM Serif Display", Georgia, serif; font-weight: 400; }
 .host-cta-side { max-width: 365px; }
 .host-cta-side p { margin-bottom: 22px; color: rgba(255,255,255,.73); font-size: 13px; line-height: 1.8; }
 
+/* Shared branded footer and newsletter form. */
 .site-footer { padding: 64px max(36px, calc((100% - 1200px) / 2)) 0; color: #f1f0e9; background: #20261f; }
 .footer-main { display: grid; grid-template-columns: 1.4fr .75fr .8fr 1.35fr; gap: 45px; padding-bottom: 52px; }
 .footer-brand { color: #f1f0e9; }
@@ -205,6 +209,7 @@ em { font-family: "DM Serif Display", Georgia, serif; font-weight: 400; }
 .footer-bottom > span:last-child { display: flex; gap: 19px; }
 .footer-bottom a:hover { color: #fff; }
 
+/* Studio directory filters, results, and empty/loading states. */
 .listing-page { min-height: 68vh; padding-block: 64px 105px; }
 .page-intro { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; padding-bottom: 32px; }
 .page-intro h1, .form-page-heading h1, .dashboard-heading h1 { margin: 11px 0 9px; font-size: clamp(39px, 5vw, 59px); letter-spacing: -2.5px; line-height: 1.08; }
@@ -237,6 +242,7 @@ em { font-family: "DM Serif Display", Georgia, serif; font-weight: 400; }
 .spin { animation: spin .75s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* Sign-in and registration layouts share the same two-column visual treatment. */
 .auth-page { min-height: calc(100vh - 76px); display: grid; grid-template-columns: minmax(380px, .92fr) 1.08fr; background: var(--surface); }
 .auth-visual { position: relative; min-height: 710px; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; padding: 38px clamp(35px, 6vw, 86px); color: #fff; background-color: #3d493a; background-position: center; background-size: cover; }
 .auth-visual::before { position: absolute; inset: 0; content: ""; background: linear-gradient(180deg, rgba(18,25,19,.35), rgba(18,25,19,.19) 40%, rgba(18,25,19,.75)); }
@@ -286,6 +292,7 @@ em { font-family: "DM Serif Display", Georgia, serif; font-weight: 400; }
 .password-hint.has-error { color: var(--danger); }
 .password-hint.is-valid { color: var(--green); }
 
+/* Create and edit studio forms. */
 .form-page { padding-block: 43px 100px; }
 .form-page-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 25px; padding: 34px 0 29px; }
 .form-page-heading h1 { margin-top: 9px; }
@@ -325,6 +332,7 @@ em { font-family: "DM Serif Display", Georgia, serif; font-weight: 400; }
 .form-submit-row { display: flex; align-items: center; justify-content: space-between; gap: 15px; margin-top: 25px; padding-top: 20px; border-top: 1px solid var(--line); }
 .form-submit-row p { margin: 0; color: var(--ink-soft); font-size: 10px; }
 
+/* Host dashboard, listing controls, and confirmation dialog. */
 .dashboard-page { min-height: 65vh; padding-block: 67px 105px; }
 .dashboard-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 22px; margin-bottom: 33px; }
 .dashboard-heading .button { white-space: nowrap; }
@@ -348,6 +356,7 @@ em { font-family: "DM Serif Display", Georgia, serif; font-weight: 400; }
 .modal-actions { display: flex; justify-content: flex-end; gap: 9px; margin-top: 25px; }
 .modal-actions .button { min-height: 41px; padding-inline: 14px; font-size: 11px; }
 
+/* Studio detail gallery, host information, booking card, and reviews. */
 .detail-page { padding-block: 38px 100px; }
 .detail-title-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 22px; padding: 24px 0 20px; }
 .detail-title-row h1 { margin: 5px 0 8px; font-size: clamp(31px, 4vw, 43px); letter-spacing: -1.7px; line-height: 1.1; }
@@ -412,6 +421,7 @@ em { font-family: "DM Serif Display", Georgia, serif; font-weight: 400; }
 .review-form > label { margin: 0; }
 .review-form .button { justify-self: start; min-height: 40px; font-size: 10px; }
 
+/* Booking history for guests and booking requests for hosts. */
 .booking-tabs { display: flex; gap: 23px; margin: 20px 0 0; border-bottom: 1px solid var(--line); }
 .booking-tabs button { display: inline-flex; align-items: center; gap: 8px; padding: 12px 0; border: 0; border-bottom: 2px solid transparent; color: var(--ink-soft); background: transparent; font-size: 11px; cursor: pointer; }
 .booking-tabs button.active { border-color: var(--green); color: var(--ink); font-weight: 700; }
@@ -435,6 +445,7 @@ em { font-family: "DM Serif Display", Georgia, serif; font-weight: 400; }
 .booking-cancel-link { display: inline-flex; align-items: center; gap: 4px; padding: 0; border: 0; color: var(--danger); background: transparent; font-size: 9px; cursor: pointer; }
 .host-booking-actions { display: flex; gap: 5px; }
 
+/* Branded recovery and policy pages. */
 .not-found-page { min-height: 600px; display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 60px; padding-block: 75px; }
 .not-found-art { position: relative; width: min(100%, 440px); aspect-ratio: 1; display: grid; place-items: center; margin-inline: auto; overflow: hidden; border-radius: 50%; background: var(--surface-soft); }
 .not-found-aperture { width: 190px; height: 190px; display: grid; place-items: center; border-radius: 50%; color: var(--green); background: var(--lime); animation: breathe 5s ease-in-out infinite; }
@@ -456,6 +467,7 @@ em { font-family: "DM Serif Display", Georgia, serif; font-weight: 400; }
 .legal-page p { color: var(--ink-soft); font-size: 13px; line-height: 1.9; }
 .legal-page .text-link { margin-top: 18px; }
 
+/* Adjust layout and controls as the viewport gets narrower. */
 @media (min-width: 1440px) {
   .hero-content, .trust-inner { width: min(1280px, calc(100% - 100px)); }
 }

@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
+// Verify the HTTP-only session cookie before a protected route can run.
 async function requireAuth(req, res, next) {
   const token = req.cookies.studiospace_token;
 
@@ -10,6 +11,7 @@ async function requireAuth(req, res, next) {
 
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET);
+    // Load the current account and leave its password hash out of the request.
     const user = await User.findById(payload.userId).select("-passwordHash");
 
     if (!user) {

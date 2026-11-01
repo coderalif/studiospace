@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 
+// Read the database address from the environment, never from committed source code.
 async function connectToDatabase() {
   const { MONGODB_URI } = process.env;
 

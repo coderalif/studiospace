@@ -14,6 +14,7 @@ export function Header() {
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
 
+  // Show account pages only after the current session has been restored.
   const links = [
     ["Studios", "/studios"],
     ["How it works", "/#how-it-works"],
