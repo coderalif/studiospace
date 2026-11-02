@@ -154,6 +154,30 @@ router.post("/logout", (req, res) => {
   return res.json({ message: "You are logged out." });
 });
 
+router.patch("/profile", requireAuth, async (req, res) => {
+  const { photoURL } = req.body;
+
+  if (typeof photoURL !== "string" || !photoURL.trim() || photoURL.length > 2048) {
+    return res.status(400).json({ message: "Choose a valid profile photo." });
+  }
+
+  let photo;
+  try {
+    photo = new URL(photoURL.trim());
+  } catch {
+    return res.status(400).json({ message: "Choose a valid profile photo." });
+  }
+
+  if (!["http:", "https:"].includes(photo.protocol)) {
+    return res.status(400).json({ message: "Choose a valid profile photo." });
+  }
+
+  req.user.photoURL = photo.toString();
+  await req.user.save();
+
+  return res.json({ message: "Your profile photo has been updated.", user: publicUser(req.user) });
+});
+
 router.get("/me", (req, res, next) => {
   if (!req.cookies.studiospace_token) {
     return res.json({ user: null });

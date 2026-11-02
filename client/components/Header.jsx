@@ -18,7 +18,7 @@ export function Header() {
   const links = [
     ["Studios", "/studios"],
     ["How it works", "/#how-it-works"],
-    ...(user ? [["My bookings", "/my-bookings"], ["My listings", "/my-listings"], ["Saved studios", "/saved-studios"]] : []),
+    ...(user ? [["Profile settings", "/profile"], ["My bookings", "/my-bookings"], ["My listings", "/my-listings"], ["Saved studios", "/saved-studios"]] : []),
   ];
 
   async function logout() {
@@ -58,7 +58,7 @@ export function Header() {
           {!authLoading && (user ? (
             <>
               <Link className="host-link" href="/add-studio"><Plus size={16} /> Host a space</Link>
-              <Link className="avatar-link" href="/my-listings" title={user.name}>
+              <Link className="avatar-link" href="/profile" title="Profile settings">
                 {user.photoURL ? <img src={user.photoURL} alt="" /> : user.name?.slice(0, 1).toUpperCase()}
               </Link>
               <button className="logout-button" onClick={logout} aria-label="Sign out"><LogOut size={17} /></button>

@@ -19,6 +19,7 @@ StudioSpace is a peer-to-peer marketplace for creative studios and production sp
 - Browse a responsive creative-space directory and manage host listings from the Next.js client.
 - Switch between light and dark themes.
 - Save favorite studios to a personal wishlist and download PDF invoices for confirmed bookings.
+- Update the signed-in user's profile photo from account settings.
 
 ## Technology
 
@@ -65,6 +66,7 @@ For the deployed Vercel client, `NEXT_PUBLIC_API_URL` is set to `https://studios
 | POST | `/api/auth/google` | Public | Sign in with a Google ID token |
 | POST | `/api/auth/logout` | Public | Clear the auth cookie |
 | GET | `/api/auth/me` | Logged in | Return the current user |
+| PATCH | `/api/auth/profile` | Logged in | Update the current user's profile photo URL |
 | GET | `/api/studios/featured` | Public | Return up to six featured studios |
 | GET | `/api/studios/saved` | Logged in | List the current user's saved studios |
 | PUT | `/api/studios/:id/saved` | Logged in | Save a studio to the wishlist |
