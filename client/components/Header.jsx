@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Aperture, Heart, LogOut, Menu, Moon, Plus, Sun, X } from "lucide-react";
+import { Aperture, LogOut, Menu, Moon, Plus, Sun, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
