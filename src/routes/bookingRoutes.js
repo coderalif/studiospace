@@ -1,5 +1,6 @@
 const { Router } = require("express");
 const mongoose = require("mongoose");
+const PDFDocument = require("pdfkit");
 const Booking = require("../models/Booking");
 const requireAuth = require("../middleware/requireAuth");
 const Studio = require("../models/Studio");
@@ -98,6 +99,56 @@ router.get("/mine", async (req, res) => {
     .populate("studio", "title category imageURL location owner");
 
   return res.json({ bookings });
+});
+
+router.get("/:id/invoice", async (req, res, next) => {
+  if (!mongoose.isValidObjectId(req.params.id)) {
+    return res.status(400).json({ message: "The booking ID is not valid." });
+  }
+
+  const booking = await Booking.findOne({
+    _id: req.params.id,
+    renter: req.user._id,
+  }).populate("studio", "title location");
+
+  if (!booking) {
+    return res.status(404).json({ message: "Booking not found." });
+  }
+  if (booking.status !== "Confirmed") {
+    return res.status(409).json({ message: "An invoice is available after the host confirms your booking." });
+  }
+
+  const filename = `studiospace-invoice-${booking._id}.pdf`;
+  const document = new PDFDocument({ size: "A4", margin: 56 });
+  document.on("error", next);
+  res.setHeader("Content-Type", "application/pdf");
+  res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+  document.pipe(res);
+
+  document.fontSize(24).text("StudioSpace", { continued: false });
+  document.moveDown(0.5);
+  document.fontSize(18).text("Booking invoice");
+  document.moveDown();
+  document.fontSize(11);
+  document.text(`Invoice number: ${booking._id}`);
+  document.text(`Issued: ${new Date().toLocaleDateString("en-US")}`);
+  document.moveDown();
+  document.fontSize(14).text(booking.studioTitle);
+  document.fontSize(11);
+  document.text(`Location: ${booking.studio?.location || "StudioSpace"}`);
+  document.text(`Guest: ${req.user.name}`);
+  document.text(`Email: ${req.user.email}`);
+  document.moveDown();
+  document.text(`Start: ${booking.startAt.toLocaleString("en-US")}`);
+  document.text(`End: ${booking.endAt.toLocaleString("en-US")}`);
+  document.text(`Guests: ${booking.guestCount}`);
+  document.text("Status: Confirmed");
+  document.moveDown();
+  document.fontSize(15).text(`Booking total: $${booking.totalPrice.toFixed(2)}`);
+  document.moveDown(2);
+  document.fontSize(9).fillColor("#666666")
+    .text("Keep this invoice for your records. Your reservation was confirmed by the studio host.");
+  document.end();
 });
 
 router.patch("/:id/status", async (req, res) => {

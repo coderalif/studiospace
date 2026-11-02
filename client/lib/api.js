@@ -28,6 +28,17 @@ export async function api(path, options = {}) {
   return data;
 }
 
+export async function apiFile(path) {
+  const response = await fetch(`${API_URL}${path}`, { credentials: "include" });
+  if (!response.ok) {
+    const contentType = response.headers.get("content-type") || "";
+    const data = contentType.includes("application/json") ? await response.json() : null;
+    throw new Error(data?.message || `Request failed (${response.status}).`);
+  }
+
+  return response.blob();
+}
+
 export function imageUrl(studio) {
   return (
     studio?.imageURL ||

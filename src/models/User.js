@@ -26,6 +26,10 @@ const userSchema = new mongoose.Schema(
       required: true,
       select: false,
     },
+    savedStudios: {
+      type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Studio" }],
+      default: [],
+    },
   },
   { timestamps: true },
 );

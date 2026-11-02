@@ -35,6 +35,7 @@ function publicUser(user) {
     name: user.name,
     email: user.email,
     photoURL: user.photoURL,
+    savedStudios: (user.savedStudios || []).map((studioId) => studioId.toString()),
   };
 }
 

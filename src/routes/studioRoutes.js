@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const Booking = require("../models/Booking");
 const requireAuth = require("../middleware/requireAuth");
 const Studio = require("../models/Studio");
+const User = require("../models/User");
 const { studioCategories } = require("../models/Studio");
 
 const router = Router();
@@ -87,6 +88,17 @@ router.get("/mine", requireAuth, async (req, res) => {
   return res.json({ studios });
 });
 
+router.get("/saved", requireAuth, async (req, res) => {
+  const savedIds = req.user.savedStudios || [];
+  const studios = await Studio.find({ _id: { $in: savedIds } })
+    .populate("owner", "name photoURL");
+  const studiosById = new Map(studios.map((studio) => [studio._id.toString(), studio]));
+
+  return res.json({
+    studios: savedIds.map((id) => studiosById.get(id.toString())).filter(Boolean),
+  });
+});
+
 router.get("/", async (req, res) => {
   const page = Math.max(Number.parseInt(req.query.page, 10) || 1, 1);
   const limit = Math.min(Math.max(Number.parseInt(req.query.limit, 10) || 12, 1), 50);
@@ -123,6 +135,53 @@ router.get("/", async (req, res) => {
   ]);
 
   return res.json({ studios, pagination: { page, limit, total, pages: Math.ceil(total / limit) } });
+});
+
+router.put("/:id/saved", requireAuth, async (req, res) => {
+  if (!mongoose.isValidObjectId(req.params.id)) {
+    return res.status(400).json({ message: "The studio ID is not valid." });
+  }
+
+  const studio = await Studio.exists({ _id: req.params.id });
+  if (!studio) {
+    return res.status(404).json({ message: "Studio listing not found." });
+  }
+
+  const user = await User.findByIdAndUpdate(
+    req.user._id,
+    { $addToSet: { savedStudios: studio._id } },
+    { new: true },
+  ).select("savedStudios");
+
+  if (!user) {
+    return res.status(401).json({ message: "Your session is no longer valid." });
+  }
+
+  return res.json({
+    message: "Studio saved to your wishlist.",
+    savedStudios: user.savedStudios.map((id) => id.toString()),
+  });
+});
+
+router.delete("/:id/saved", requireAuth, async (req, res) => {
+  if (!mongoose.isValidObjectId(req.params.id)) {
+    return res.status(400).json({ message: "The studio ID is not valid." });
+  }
+
+  const user = await User.findByIdAndUpdate(
+    req.user._id,
+    { $pull: { savedStudios: req.params.id } },
+    { new: true },
+  ).select("savedStudios");
+
+  if (!user) {
+    return res.status(401).json({ message: "Your session is no longer valid." });
+  }
+
+  return res.json({
+    message: "Studio removed from your wishlist.",
+    savedStudios: user.savedStudios.map((id) => id.toString()),
+  });
 });
 
 router.post("/", requireAuth, async (req, res) => {

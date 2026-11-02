@@ -18,6 +18,7 @@ StudioSpace is a peer-to-peer marketplace for creative studios and production sp
 - Keep secrets in environment variables rather than source files.
 - Browse a responsive creative-space directory and manage host listings from the Next.js client.
 - Switch between light and dark themes.
+- Save favorite studios to a personal wishlist and download PDF invoices for confirmed bookings.
 
 ## Technology
 
@@ -65,6 +66,9 @@ For the deployed Vercel client, set `NEXT_PUBLIC_API_URL` to `https://studiospac
 | POST | `/api/auth/logout` | Public | Clear the auth cookie |
 | GET | `/api/auth/me` | Logged in | Return the current user |
 | GET | `/api/studios/featured` | Public | Return up to six featured studios |
+| GET | `/api/studios/saved` | Logged in | List the current user's saved studios |
+| PUT | `/api/studios/:id/saved` | Logged in | Save a studio to the wishlist |
+| DELETE | `/api/studios/:id/saved` | Logged in | Remove a studio from the wishlist |
 | GET | `/api/studios` | Public | Browse, filter, and search studios |
 | GET | `/api/studios/:id` | Public | Read studio details |
 | POST | `/api/studios` | Logged in | Create a listing |
@@ -75,6 +79,7 @@ For the deployed Vercel client, set `NEXT_PUBLIC_API_URL` to `https://studiospac
 | POST | `/api/uploads` | Logged in | Upload an image using multipart field `image` |
 | POST | `/api/bookings` | Logged in | Request a booking |
 | GET | `/api/bookings/mine` | Logged in | List the current user's bookings |
+| GET | `/api/bookings/:id/invoice` | Booking guest | Download a PDF invoice after confirmation |
 | GET | `/api/bookings/host` | Logged in | List bookings for the current host's studios |
 | PATCH | `/api/bookings/:id/status` | Studio host | Confirm, complete, or cancel a booking |
 | PATCH | `/api/bookings/:id/cancel` | Booking guest | Cancel a pending booking |
