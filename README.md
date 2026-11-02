@@ -3,7 +3,8 @@
 StudioSpace is a peer-to-peer marketplace for creative studios and production spaces. This repository includes the Express/MongoDB API and a responsive Next.js client.
 
 **Local website:** `http://localhost:3000` (available while the frontend dev server is running).
-**Live client:** Not deployed yet. Add the public client URL here after deployment.
+**Live client:** https://studiospace-pearl.vercel.app
+**Live API:** https://studiospace-j8pk.vercel.app/api
 
 ## Features
 
@@ -51,6 +52,8 @@ StudioSpace is a peer-to-peer marketplace for creative studios and production sp
 
 For a client hosted on a different site, configure `COOKIE_SAME_SITE=none` and `COOKIE_SECURE=true` over HTTPS. Keep those cookie settings and all API secrets in the hosting provider's environment settings.
 For local development, the API's `CLIENT_URL` should include `http://localhost:3000`.
+
+For the deployed Vercel client, set `NEXT_PUBLIC_API_URL` to `https://studiospace-j8pk.vercel.app/api`. To enable Google sign-in, set `NEXT_PUBLIC_GOOGLE_CLIENT_ID` in the Vercel client project's Production environment and `GOOGLE_CLIENT_ID` in the API project's environment to the same Google OAuth Web client ID, then redeploy both projects. Add `https://studiospace-pearl.vercel.app` to the OAuth client's authorized JavaScript origins.
 
 ## Main API routes
 

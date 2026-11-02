@@ -54,7 +54,7 @@ function LoginForm() {
 
   function handleGoogleClick() {
     if (!GOOGLE_CLIENT_ID) {
-      toast.error("Google sign-in needs a client ID in client/.env.local.");
+      toast.error("Google sign-in is not configured for this site. Add the client ID to the frontend environment and redeploy.");
       return;
     }
     if (!window.google?.accounts?.id) {

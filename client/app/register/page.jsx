@@ -62,7 +62,7 @@ export default function RegisterPage() {
   }
 
   function handleGoogleClick() {
-    if (!GOOGLE_CLIENT_ID) return toast.error("Google sign-in needs a client ID in client/.env.local.");
+    if (!GOOGLE_CLIENT_ID) return toast.error("Google sign-in is not configured for this site. Add the client ID to the frontend environment and redeploy.");
     if (!window.google?.accounts?.id) return toast.error("Google sign-in is still loading. Please try again.");
     window.google.accounts.id.prompt();
   }
