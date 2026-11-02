@@ -82,7 +82,7 @@ router.post("/login", async (req, res) => {
   return res.json({ message: "You are logged in.", user: publicUser(user) });
 });
 
-router.post("/google", async (req, res) => {
+router.post("/google", async (req, res, next) => {
   const { credential } = req.body;
   const clientId = process.env.GOOGLE_CLIENT_ID;
 
@@ -95,7 +95,34 @@ router.post("/google", async (req, res) => {
 
   // Verify Google's signed credential on the server before trusting profile details.
   const googleClient = new OAuth2Client(clientId);
-  const ticket = await googleClient.verifyIdToken({ idToken: credential, audience: clientId });
+  let ticket;
+  try {
+    ticket = await googleClient.verifyIdToken({ idToken: credential, audience: clientId });
+  } catch (error) {
+    const invalidCredentialMessages = [
+      "Wrong number of segments in token:",
+      "Can't parse token envelope:",
+      "Can't parse token payload",
+      "No pem found for envelope:",
+      "Invalid token signature:",
+      "No issue time in token:",
+      "No expiration time in token:",
+      "iat field using invalid format",
+      "exp field using invalid format",
+      "Expiration time too far in future:",
+      "Token used too early,",
+      "Token used too late,",
+      "Invalid issuer,",
+      "Wrong recipient, payload audience",
+    ];
+
+    if (invalidCredentialMessages.some((message) => error.message?.startsWith(message))) {
+      return res.status(401).json({ message: "Google could not verify this account." });
+    }
+
+    return next(error);
+  }
+
   const profile = ticket.getPayload();
 
   if (!profile || !profile.email || !profile.email_verified) {
