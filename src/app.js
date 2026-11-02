@@ -7,6 +7,7 @@ const bookingRoutes = require("./routes/bookingRoutes");
 const studioRoutes = require("./routes/studioRoutes");
 const uploadRoutes = require("./routes/uploadRoutes");
 const errorHandler = require("./middleware/errorHandler");
+const connectToDatabase = require("./config/db");
 
 const app = express();
 const allowedOrigins = (process.env.CLIENT_URL || "http://localhost:3000")
@@ -32,6 +33,16 @@ app.use(cookieParser());
 // A small endpoint for checking that the API process is responding.
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok", message: "StudioSpace API is running." });
+});
+
+// Serverless deployments create the database connection when a data route runs.
+app.use("/api", async (req, res, next) => {
+  try {
+    await connectToDatabase();
+    return next();
+  } catch (error) {
+    return next(error);
+  }
 });
 
 // Keep each feature's routes in a separate file so the app setup stays easy to scan.

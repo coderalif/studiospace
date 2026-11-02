@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 
+let connectionPromise;
+
 // Read the database address from the environment, never from committed source code.
 async function connectToDatabase() {
   const { MONGODB_URI } = process.env;
@@ -8,8 +10,23 @@ async function connectToDatabase() {
     throw new Error("MONGODB_URI is missing. Add it to your .env file.");
   }
 
-  await mongoose.connect(MONGODB_URI);
-  console.log("Connected to MongoDB");
+  if (mongoose.connection.readyState === 1) {
+    return mongoose.connection;
+  }
+
+  if (!connectionPromise) {
+    connectionPromise = mongoose
+      .connect(MONGODB_URI)
+      .then(() => {
+        console.log("Connected to MongoDB");
+        return mongoose.connection;
+      })
+      .finally(() => {
+        connectionPromise = null;
+      });
+  }
+
+  return connectionPromise;
 }
 
 module.exports = connectToDatabase;
