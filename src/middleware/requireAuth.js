@@ -15,14 +15,21 @@ async function requireAuth(req, res, next) {
     const user = await User.findById(payload.userId).select("-passwordHash");
 
     if (!user) {
-      return res.status(401).json({ message: "Your session is no longer valid." });
+      return res
+        .status(401)
+        .json({ message: "Your session is no longer valid." });
     }
 
     req.user = user;
     return next();
   } catch (error) {
-    if (error.name === "JsonWebTokenError" || error.name === "TokenExpiredError") {
-      return res.status(401).json({ message: "Your session has expired. Please log in again." });
+    if (
+      error.name === "JsonWebTokenError" ||
+      error.name === "TokenExpiredError"
+    ) {
+      return res
+        .status(401)
+        .json({ message: "Your session has expired. Please log in again." });
     }
 
     return next(error);

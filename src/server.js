@@ -11,7 +11,9 @@ async function startServer() {
     !process.env.JWT_SECRET ||
     process.env.JWT_SECRET === "replace-this-with-a-long-random-secret"
   ) {
-    throw new Error("Set a unique JWT_SECRET in your .env file before starting the API.");
+    throw new Error(
+      "Set a unique JWT_SECRET in your .env file before starting the API.",
+    );
   }
 
   // Keep the API offline until its database connection is ready.

@@ -15,7 +15,12 @@ function validDate(value) {
 }
 
 // Two intervals overlap when each one begins before the other one ends.
-async function findConfirmedOverlap(studioId, startAt, endAt, ignoredBookingId) {
+async function findConfirmedOverlap(
+  studioId,
+  startAt,
+  endAt,
+  ignoredBookingId,
+) {
   const filter = {
     studio: studioId,
     status: "Confirmed",
@@ -30,6 +35,7 @@ async function findConfirmedOverlap(studioId, startAt, endAt, ignoredBookingId) 
   return Booking.exists(filter);
 }
 
+// Serialize confirmations for one studio so simultaneous requests cannot claim the same slot.
 async function withStudioBookingLock(studioId, action) {
   const token = randomUUID();
   const waitUntil = Date.now() + 10_000;
@@ -68,13 +74,20 @@ async function withStudioBookingLock(studioId, action) {
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
 
-  const error = new Error("Another booking update is in progress. Please try again.");
+  const error = new Error(
+    "Another booking update is in progress. Please try again.",
+  );
   error.status = 409;
   throw error;
 }
 
 router.post("/", async (req, res) => {
-  const { studioId, startAt: startValue, endAt: endValue, guestCount: guestCountValue } = req.body;
+  const {
+    studioId,
+    startAt: startValue,
+    endAt: endValue,
+    guestCount: guestCountValue,
+  } = req.body;
 
   if (!mongoose.isValidObjectId(studioId)) {
     return res.status(400).json({ message: "Choose a valid studio." });
@@ -84,10 +97,14 @@ router.post("/", async (req, res) => {
   const endAt = validDate(endValue);
   const guestCount = Number(guestCountValue);
   if (!startAt || !endAt || startAt <= new Date() || endAt <= startAt) {
-    return res.status(400).json({ message: "Choose a valid future start and end time." });
+    return res
+      .status(400)
+      .json({ message: "Choose a valid future start and end time." });
   }
   if (!Number.isInteger(guestCount) || guestCount < 1) {
-    return res.status(400).json({ message: "Guest count must be at least one." });
+    return res
+      .status(400)
+      .json({ message: "Guest count must be at least one." });
   }
 
   const studio = await Studio.findById(studioId);
@@ -95,17 +112,22 @@ router.post("/", async (req, res) => {
     return res.status(404).json({ message: "Studio listing not found." });
   }
   if (studio.owner.equals(req.user._id)) {
-    return res.status(400).json({ message: "You cannot book your own studio." });
+    return res
+      .status(400)
+      .json({ message: "You cannot book your own studio." });
   }
   if (guestCount > studio.maxCapacity) {
-    return res.status(400).json({ message: "Guest count exceeds this studio's maximum capacity." });
+    return res
+      .status(400)
+      .json({ message: "Guest count exceeds this studio's maximum capacity." });
   }
 
   // Pending requests do not reserve a time; only confirmed bookings block it.
   const overlap = await findConfirmedOverlap(studio._id, startAt, endAt);
   if (overlap) {
     return res.status(409).json({
-      message: "This time overlaps an existing confirmed booking. Please choose another time.",
+      message:
+        "This time overlaps an existing confirmed booking. Please choose another time.",
     });
   }
 
@@ -129,7 +151,9 @@ router.post("/", async (req, res) => {
 router.get("/host", async (req, res) => {
   // Hosts see requests only for studios they own.
   const ownedStudios = await Studio.find({ owner: req.user._id }).select("_id");
-  const bookings = await Booking.find({ studio: { $in: ownedStudios.map((studio) => studio._id) } })
+  const bookings = await Booking.find({
+    studio: { $in: ownedStudios.map((studio) => studio._id) },
+  })
     .sort({ createdAt: -1 })
     .populate("studio", "title category imageURL location")
     .populate("renter", "name email photoURL");
@@ -159,7 +183,9 @@ router.get("/:id/invoice", async (req, res, next) => {
     return res.status(404).json({ message: "Booking not found." });
   }
   if (booking.status !== "Confirmed") {
-    return res.status(409).json({ message: "An invoice is available after the host confirms your booking." });
+    return res.status(409).json({
+      message: "An invoice is available after the host confirms your booking.",
+    });
   }
 
   const filename = `studiospace-invoice-${booking._id}.pdf`;
@@ -188,10 +214,16 @@ router.get("/:id/invoice", async (req, res, next) => {
   document.text(`Guests: ${booking.guestCount}`);
   document.text("Status: Confirmed");
   document.moveDown();
-  document.fontSize(15).text(`Booking total: $${booking.totalPrice.toFixed(2)}`);
+  document
+    .fontSize(15)
+    .text(`Booking total: $${booking.totalPrice.toFixed(2)}`);
   document.moveDown(2);
-  document.fontSize(9).fillColor("#666666")
-    .text("Keep this invoice for your records. Your reservation was confirmed by the studio host.");
+  document
+    .fontSize(9)
+    .fillColor("#666666")
+    .text(
+      "Keep this invoice for your records. Your reservation was confirmed by the studio host.",
+    );
   document.end();
 });
 
@@ -213,7 +245,9 @@ router.patch("/:id/status", async (req, res) => {
 
     const studio = await Studio.findById(booking.studio);
     if (!studio || !studio.owner.equals(req.user._id)) {
-      return res.status(403).json({ message: "Only the studio host can update this booking." });
+      return res
+        .status(403)
+        .json({ message: "Only the studio host can update this booking." });
     }
 
     const { status } = req.body;
@@ -223,7 +257,9 @@ router.patch("/:id/status", async (req, res) => {
       Confirmed: ["Completed", "Cancelled"],
     };
     if (!allowedTransitions[booking.status]?.includes(status)) {
-      return res.status(400).json({ message: "That booking status change is not allowed." });
+      return res
+        .status(400)
+        .json({ message: "That booking status change is not allowed." });
     }
 
     if (status === "Confirmed") {
@@ -240,12 +276,17 @@ router.patch("/:id/status", async (req, res) => {
       }
     }
     if (status === "Completed" && booking.endAt > new Date()) {
-      return res.status(400).json({ message: "A booking can only be completed after its end time." });
+      return res.status(400).json({
+        message: "A booking can only be completed after its end time.",
+      });
     }
 
     booking.status = status;
     await booking.save();
-    return res.json({ message: `Booking status changed to ${status}.`, booking });
+    return res.json({
+      message: `Booking status changed to ${status}.`,
+      booking,
+    });
   });
 });
 
@@ -254,18 +295,26 @@ router.patch("/:id/cancel", async (req, res) => {
     return res.status(400).json({ message: "The booking ID is not valid." });
   }
 
-  const requestedBooking = await Booking.findOne({ _id: req.params.id, renter: req.user._id });
+  const requestedBooking = await Booking.findOne({
+    _id: req.params.id,
+    renter: req.user._id,
+  });
   if (!requestedBooking) {
     return res.status(404).json({ message: "Booking not found." });
   }
 
   return withStudioBookingLock(requestedBooking.studio, async () => {
-    const booking = await Booking.findOne({ _id: req.params.id, renter: req.user._id });
+    const booking = await Booking.findOne({
+      _id: req.params.id,
+      renter: req.user._id,
+    });
     if (!booking) {
       return res.status(404).json({ message: "Booking not found." });
     }
     if (booking.status !== "Pending") {
-      return res.status(409).json({ message: "Only pending bookings can be cancelled by the guest." });
+      return res.status(409).json({
+        message: "Only pending bookings can be cancelled by the guest.",
+      });
     }
 
     // Guests may cancel their own pending request, but not a confirmed booking.

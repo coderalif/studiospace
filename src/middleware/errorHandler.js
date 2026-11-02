@@ -16,16 +16,22 @@ function errorHandler(error, req, res, next) {
   }
 
   if (error.code === "LIMIT_FILE_SIZE") {
-    return res.status(400).json({ message: "The image must be 5 MB or smaller." });
+    return res
+      .status(400)
+      .json({ message: "The image must be 5 MB or smaller." });
   }
 
   if (error.code === 11000) {
-    return res.status(409).json({ message: "An account with this email already exists." });
+    return res
+      .status(409)
+      .json({ message: "An account with this email already exists." });
   }
 
   console.error(error);
   return res.status(error.status || 500).json({
-    message: error.status ? error.message : "An unexpected server error occurred.",
+    message: error.status
+      ? error.message
+      : "An unexpected server error occurred.",
   });
 }
 

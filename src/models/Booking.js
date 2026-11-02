@@ -3,9 +3,17 @@ const mongoose = require("mongoose");
 // Snapshot the booking details so the reservation remains readable if a listing changes.
 const bookingSchema = new mongoose.Schema(
   {
-    studio: { type: mongoose.Schema.Types.ObjectId, ref: "Studio", required: true },
+    studio: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Studio",
+      required: true,
+    },
     studioTitle: { type: String, required: true, trim: true },
-    renter: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    renter: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     renterEmail: { type: String, required: true, lowercase: true, trim: true },
     startAt: { type: Date, required: true },
     endAt: { type: Date, required: true },

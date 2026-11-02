@@ -7,7 +7,12 @@ import { RequireAuth } from "../../components/RequireAuth";
 import { useAuth } from "../../components/AppProviders";
 import { api } from "../../lib/api";
 
-const allowedImageTypes = ["image/jpeg", "image/png", "image/webp", "image/avif"];
+const allowedImageTypes = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/avif",
+];
 const maxImageSize = 5 * 1024 * 1024;
 
 function ProfileSettings() {
@@ -27,6 +32,7 @@ function ProfileSettings() {
 
     setUploading(true);
     try {
+      // Upload the file first; the profile endpoint stores the hosted image URL.
       const body = new FormData();
       body.append("image", file);
       const { imageURL } = await api("/uploads", { method: "POST", body });
@@ -46,17 +52,31 @@ function ProfileSettings() {
   return (
     <div className="profile-page page-container">
       <span className="eyebrow">Your account</span>
-      <h1>Profile <em>settings.</em></h1>
+      <h1>
+        Profile <em>settings.</em>
+      </h1>
       <p className="profile-intro">Keep your account photo up to date.</p>
       <section className="profile-card" aria-labelledby="profile-photo-heading">
         <div className="profile-avatar">
-          {user?.photoURL ? <img src={user.photoURL} alt={`${user.name}'s profile`} /> : <UserRound size={34} />}
+          {user?.photoURL ? (
+            <img src={user.photoURL} alt={`${user.name}'s profile`} />
+          ) : (
+            <UserRound size={34} />
+          )}
         </div>
         <div className="profile-details">
           <h2 id="profile-photo-heading">{user?.name}</h2>
           <p>{user?.email}</p>
           <label className="button button-outline profile-upload-button">
-            {uploading ? <><LoaderCircle size={16} className="spin" /> Uploading…</> : <><ImagePlus size={16} /> Change profile photo</>}
+            {uploading ? (
+              <>
+                <LoaderCircle size={16} className="spin" /> Uploading…
+              </>
+            ) : (
+              <>
+                <ImagePlus size={16} /> Change profile photo
+              </>
+            )}
             <input
               type="file"
               accept="image/jpeg,image/png,image/webp,image/avif"
@@ -75,5 +95,9 @@ function ProfileSettings() {
 }
 
 export default function ProfilePage() {
-  return <RequireAuth><ProfileSettings /></RequireAuth>;
+  return (
+    <RequireAuth>
+      <ProfileSettings />
+    </RequireAuth>
+  );
 }

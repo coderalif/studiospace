@@ -26,7 +26,9 @@ function SavedStudiosContent() {
   }, []);
 
   function removeSavedStudio(id) {
-    setStudios((current) => current.filter((studio) => studioId(studio) !== id));
+    setStudios((current) =>
+      current.filter((studio) => studioId(studio) !== id),
+    );
   }
 
   return (
@@ -34,7 +36,9 @@ function SavedStudiosContent() {
       <div className="dashboard-heading">
         <div>
           <span className="eyebrow">Saved for later</span>
-          <h1>Your <em>shortlist.</em></h1>
+          <h1>
+            Your <em>shortlist.</em>
+          </h1>
           <p>Keep the spaces you love close by for your next project.</p>
         </div>
         <Link className="button button-dark" href="/studios">
@@ -46,24 +50,36 @@ function SavedStudiosContent() {
         <div className="empty-state">
           <h2>Couldn’t load your saved spaces.</h2>
           <p>{error}</p>
-          <button className="button button-dark" onClick={loadSavedStudios}>Try again</button>
+          <button className="button button-dark" onClick={loadSavedStudios}>
+            Try again
+          </button>
         </div>
       ) : loading ? (
         <div className="studio-grid">
-          {Array.from({ length: 3 }).map((_, index) => <StudioCardSkeleton key={index} />)}
+          {Array.from({ length: 3 }).map((_, index) => (
+            <StudioCardSkeleton key={index} />
+          ))}
         </div>
       ) : studios.length ? (
         <div className="studio-grid">
           {studios.map((studio) => (
-            <StudioCard key={studioId(studio)} studio={studio} onUnsave={removeSavedStudio} />
+            <StudioCard
+              key={studioId(studio)}
+              studio={studio}
+              onUnsave={removeSavedStudio}
+            />
           ))}
         </div>
       ) : (
         <div className="empty-state">
-          <div className="empty-icon"><Heart size={24} /></div>
+          <div className="empty-icon">
+            <Heart size={24} />
+          </div>
           <h2>Your shortlist is ready when you are.</h2>
           <p>Tap the heart on a studio to save it here for later.</p>
-          <Link className="button button-dark" href="/studios">Explore studios <ArrowRight size={16} /></Link>
+          <Link className="button button-dark" href="/studios">
+            Explore studios <ArrowRight size={16} />
+          </Link>
         </div>
       )}
     </div>
@@ -71,5 +87,9 @@ function SavedStudiosContent() {
 }
 
 export default function SavedStudiosPage() {
-  return <RequireAuth><SavedStudiosContent /></RequireAuth>;
+  return (
+    <RequireAuth>
+      <SavedStudiosContent />
+    </RequireAuth>
+  );
 }

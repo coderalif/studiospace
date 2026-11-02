@@ -23,8 +23,17 @@ function escapeRegex(value) {
 }
 
 function studioFields(body = {}) {
-  const { title, category, hourlyRate, securityDeposit, maxCapacity, location, imageURL, amenities, overview } =
-    body;
+  const {
+    title,
+    category,
+    hourlyRate,
+    securityDeposit,
+    maxCapacity,
+    location,
+    imageURL,
+    amenities,
+    overview,
+  } = body;
 
   if (typeof title !== "string" || !title.trim()) {
     return { error: "Please enter a title for the studio." };
@@ -53,7 +62,11 @@ function studioFields(body = {}) {
   if (typeof overview !== "string" || !overview.trim()) {
     return { error: "Please add a studio overview." };
   }
-  if (amenities !== undefined && (!Array.isArray(amenities) || amenities.some((item) => typeof item !== "string"))) {
+  if (
+    amenities !== undefined &&
+    (!Array.isArray(amenities) ||
+      amenities.some((item) => typeof item !== "string"))
+  ) {
     return { error: "Amenities must be a list of text values." };
   }
 
@@ -84,35 +97,51 @@ router.get("/featured", async (req, res) => {
 });
 
 router.get("/mine", requireAuth, async (req, res) => {
-  const studios = await Studio.find({ owner: req.user._id }).sort({ createdAt: -1 });
+  const studios = await Studio.find({ owner: req.user._id }).sort({
+    createdAt: -1,
+  });
   return res.json({ studios });
 });
 
 router.get("/saved", requireAuth, async (req, res) => {
   const savedIds = req.user.savedStudios || [];
-  const studios = await Studio.find({ _id: { $in: savedIds } })
-    .populate("owner", "name photoURL");
-  const studiosById = new Map(studios.map((studio) => [studio._id.toString(), studio]));
+  const studios = await Studio.find({ _id: { $in: savedIds } }).populate(
+    "owner",
+    "name photoURL",
+  );
+  const studiosById = new Map(
+    studios.map((studio) => [studio._id.toString(), studio]),
+  );
 
   return res.json({
-    studios: savedIds.map((id) => studiosById.get(id.toString())).filter(Boolean),
+    studios: savedIds
+      .map((id) => studiosById.get(id.toString()))
+      .filter(Boolean),
   });
 });
 
 router.get("/", async (req, res) => {
   const page = Math.max(Number.parseInt(req.query.page, 10) || 1, 1);
-  const limit = Math.min(Math.max(Number.parseInt(req.query.limit, 10) || 12, 1), 50);
+  const limit = Math.min(
+    Math.max(Number.parseInt(req.query.limit, 10) || 12, 1),
+    50,
+  );
   const filter = {};
 
   if (req.query.category) {
     if (!studioCategories.includes(req.query.category)) {
-      return res.status(400).json({ message: "The selected studio category is not valid." });
+      return res
+        .status(400)
+        .json({ message: "The selected studio category is not valid." });
     }
     filter.category = req.query.category;
   }
 
   if (typeof req.query.location === "string" && req.query.location.trim()) {
-    filter.location = { $regex: escapeRegex(req.query.location.trim()), $options: "i" };
+    filter.location = {
+      $regex: escapeRegex(req.query.location.trim()),
+      $options: "i",
+    };
   }
 
   if (typeof req.query.search === "string" && req.query.search.trim()) {
@@ -134,7 +163,10 @@ router.get("/", async (req, res) => {
     Studio.countDocuments(filter),
   ]);
 
-  return res.json({ studios, pagination: { page, limit, total, pages: Math.ceil(total / limit) } });
+  return res.json({
+    studios,
+    pagination: { page, limit, total, pages: Math.ceil(total / limit) },
+  });
 });
 
 router.put("/:id/saved", requireAuth, async (req, res) => {
@@ -154,7 +186,9 @@ router.put("/:id/saved", requireAuth, async (req, res) => {
   ).select("savedStudios");
 
   if (!user) {
-    return res.status(401).json({ message: "Your session is no longer valid." });
+    return res
+      .status(401)
+      .json({ message: "Your session is no longer valid." });
   }
 
   return res.json({
@@ -175,7 +209,9 @@ router.delete("/:id/saved", requireAuth, async (req, res) => {
   ).select("savedStudios");
 
   if (!user) {
-    return res.status(401).json({ message: "Your session is no longer valid." });
+    return res
+      .status(401)
+      .json({ message: "Your session is no longer valid." });
   }
 
   return res.json({
@@ -206,7 +242,10 @@ router.get("/:id", async (req, res) => {
     return res.status(400).json({ message: "The studio ID is not valid." });
   }
 
-  const studio = await Studio.findById(req.params.id).populate("owner", "name email photoURL");
+  const studio = await Studio.findById(req.params.id).populate(
+    "owner",
+    "name email photoURL",
+  );
   if (!studio) {
     return res.status(404).json({ message: "Studio listing not found." });
   }
@@ -233,7 +272,9 @@ router.patch("/:id", requireAuth, async (req, res) => {
   if (!studio) {
     const exists = await Studio.exists({ _id: req.params.id });
     return res.status(exists ? 403 : 404).json({
-      message: exists ? "You can only edit your own studio listings." : "Studio listing not found.",
+      message: exists
+        ? "You can only edit your own studio listings."
+        : "Studio listing not found.",
     });
   }
 
@@ -245,11 +286,16 @@ router.delete("/:id", requireAuth, async (req, res) => {
     return res.status(400).json({ message: "The studio ID is not valid." });
   }
 
-  const studio = await Studio.findOne({ _id: req.params.id, owner: req.user._id });
+  const studio = await Studio.findOne({
+    _id: req.params.id,
+    owner: req.user._id,
+  });
   if (!studio) {
     const exists = await Studio.exists({ _id: req.params.id });
     return res.status(exists ? 403 : 404).json({
-      message: exists ? "You can only delete your own studio listings." : "Studio listing not found.",
+      message: exists
+        ? "You can only delete your own studio listings."
+        : "Studio listing not found.",
     });
   }
 
@@ -261,7 +307,8 @@ router.delete("/:id", requireAuth, async (req, res) => {
   });
   if (activeBooking) {
     return res.status(409).json({
-      message: "This listing has an upcoming booking and cannot be deleted yet.",
+      message:
+        "This listing has an upcoming booking and cannot be deleted yet.",
     });
   }
 
@@ -275,9 +322,12 @@ router.post("/:id/reviews", requireAuth, async (req, res) => {
   }
 
   const rating = Number(req.body.rating);
-  const comment = typeof req.body.comment === "string" ? req.body.comment.trim() : "";
+  const comment =
+    typeof req.body.comment === "string" ? req.body.comment.trim() : "";
   if (!Number.isInteger(rating) || rating < 1 || rating > 5 || !comment) {
-    return res.status(400).json({ message: "Choose a rating from 1 to 5 and write a review." });
+    return res
+      .status(400)
+      .json({ message: "Choose a rating from 1 to 5 and write a review." });
   }
 
   const studio = await Studio.findById(req.params.id);
@@ -292,10 +342,14 @@ router.post("/:id/reviews", requireAuth, async (req, res) => {
     status: "Completed",
   });
   if (!completedBooking) {
-    return res.status(403).json({ message: "Only guests with a completed booking can review this studio." });
+    return res.status(403).json({
+      message: "Only guests with a completed booking can review this studio.",
+    });
   }
   if (studio.reviews.some((review) => review.author.equals(req.user._id))) {
-    return res.status(409).json({ message: "You have already reviewed this studio." });
+    return res
+      .status(409)
+      .json({ message: "You have already reviewed this studio." });
   }
 
   studio.reviews.push({
@@ -305,10 +359,13 @@ router.post("/:id/reviews", requireAuth, async (req, res) => {
     comment,
   });
   studio.rating =
-    studio.reviews.reduce((total, review) => total + review.rating, 0) / studio.reviews.length;
+    studio.reviews.reduce((total, review) => total + review.rating, 0) /
+    studio.reviews.length;
   await studio.save();
 
-  return res.status(201).json({ message: "Your review has been added.", studio });
+  return res
+    .status(201)
+    .json({ message: "Your review has been added.", studio });
 });
 
 module.exports = router;

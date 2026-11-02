@@ -1,12 +1,12 @@
 // Keep API requests pointed at one configurable origin for both local and hosted setups.
-const API_URL = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api").replace(
-  /\/$/,
-  "",
-);
+const API_URL = (
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"
+).replace(/\/$/, "");
 
 export async function api(path, options = {}) {
   const headers = new Headers(options.headers || {});
-  const hasBody = options.body !== undefined && !(options.body instanceof FormData);
+  const hasBody =
+    options.body !== undefined && !(options.body instanceof FormData);
 
   if (hasBody && !headers.has("Content-Type")) {
     headers.set("Content-Type", "application/json");
@@ -19,7 +19,9 @@ export async function api(path, options = {}) {
     credentials: "include",
   });
   const contentType = response.headers.get("content-type") || "";
-  const data = contentType.includes("application/json") ? await response.json() : null;
+  const data = contentType.includes("application/json")
+    ? await response.json()
+    : null;
 
   if (!response.ok) {
     throw new Error(data?.message || `Request failed (${response.status}).`);
@@ -32,7 +34,9 @@ export async function apiFile(path) {
   const response = await fetch(`${API_URL}${path}`, { credentials: "include" });
   if (!response.ok) {
     const contentType = response.headers.get("content-type") || "";
-    const data = contentType.includes("application/json") ? await response.json() : null;
+    const data = contentType.includes("application/json")
+      ? await response.json()
+      : null;
     throw new Error(data?.message || `Request failed (${response.status}).`);
   }
 
@@ -47,7 +51,9 @@ export function imageUrl(studio) {
 }
 
 export function money(value) {
-  return new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(Number(value) || 0);
+  return new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(
+    Number(value) || 0,
+  );
 }
 
 export function studioId(studio) {

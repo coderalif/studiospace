@@ -35,8 +35,15 @@ function publicUser(user) {
     name: user.name,
     email: user.email,
     photoURL: user.photoURL,
-    savedStudios: (user.savedStudios || []).map((studioId) => studioId.toString()),
+    savedStudios: (user.savedStudios || []).map((studioId) =>
+      studioId.toString(),
+    ),
   };
 }
 
-module.exports = { createAuthToken, setAuthCookie, clearAuthCookie, publicUser };
+module.exports = {
+  createAuthToken,
+  setAuthCookie,
+  clearAuthCookie,
+  publicUser,
+};

@@ -37,7 +37,9 @@ router.post("/register", async (req, res) => {
     return res.status(400).json({ message: "Please enter your name." });
   }
   if (typeof email !== "string" || !isValidEmail(email)) {
-    return res.status(400).json({ message: "Please enter a valid email address." });
+    return res
+      .status(400)
+      .json({ message: "Please enter a valid email address." });
   }
 
   const validationMessage = passwordError(password);
@@ -48,7 +50,9 @@ router.post("/register", async (req, res) => {
   const normalizedEmail = email.trim().toLowerCase();
   const existingUser = await User.exists({ email: normalizedEmail });
   if (existingUser) {
-    return res.status(409).json({ message: "An account with this email already exists." });
+    return res
+      .status(409)
+      .json({ message: "An account with this email already exists." });
   }
 
   const passwordHash = await bcrypt.hash(password, 12);
@@ -73,9 +77,13 @@ router.post("/login", async (req, res) => {
     return res.status(400).json({ message: "Enter your email and password." });
   }
 
-  const user = await User.findOne({ email: email.trim().toLowerCase() }).select("+passwordHash");
+  const user = await User.findOne({ email: email.trim().toLowerCase() }).select(
+    "+passwordHash",
+  );
   if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
-    return res.status(401).json({ message: "The email or password is incorrect." });
+    return res
+      .status(401)
+      .json({ message: "The email or password is incorrect." });
   }
 
   setAuthCookie(res, createAuthToken(user._id.toString()));
@@ -87,17 +95,24 @@ router.post("/google", async (req, res, next) => {
   const clientId = process.env.GOOGLE_CLIENT_ID;
 
   if (!clientId) {
-    return res.status(503).json({ message: "Google sign-in is not configured yet." });
+    return res
+      .status(503)
+      .json({ message: "Google sign-in is not configured yet." });
   }
   if (typeof credential !== "string" || !credential) {
-    return res.status(400).json({ message: "A Google sign-in credential is required." });
+    return res
+      .status(400)
+      .json({ message: "A Google sign-in credential is required." });
   }
 
   // Verify Google's signed credential on the server before trusting profile details.
   const googleClient = new OAuth2Client(clientId);
   let ticket;
   try {
-    ticket = await googleClient.verifyIdToken({ idToken: credential, audience: clientId });
+    ticket = await googleClient.verifyIdToken({
+      idToken: credential,
+      audience: clientId,
+    });
   } catch (error) {
     const invalidCredentialMessages = [
       "Wrong number of segments in token:",
@@ -116,8 +131,14 @@ router.post("/google", async (req, res, next) => {
       "Wrong recipient, payload audience",
     ];
 
-    if (invalidCredentialMessages.some((message) => error.message?.startsWith(message))) {
-      return res.status(401).json({ message: "Google could not verify this account." });
+    if (
+      invalidCredentialMessages.some((message) =>
+        error.message?.startsWith(message),
+      )
+    ) {
+      return res
+        .status(401)
+        .json({ message: "Google could not verify this account." });
     }
 
     return next(error);
@@ -126,7 +147,9 @@ router.post("/google", async (req, res, next) => {
   const profile = ticket.getPayload();
 
   if (!profile || !profile.email || !profile.email_verified) {
-    return res.status(401).json({ message: "Google could not verify this account." });
+    return res
+      .status(401)
+      .json({ message: "Google could not verify this account." });
   }
 
   const email = profile.email.toLowerCase();
@@ -146,7 +169,10 @@ router.post("/google", async (req, res, next) => {
   }
 
   setAuthCookie(res, createAuthToken(user._id.toString()));
-  return res.json({ message: "You are logged in with Google.", user: publicUser(user) });
+  return res.json({
+    message: "You are logged in with Google.",
+    user: publicUser(user),
+  });
 });
 
 router.post("/logout", (req, res) => {
@@ -157,7 +183,11 @@ router.post("/logout", (req, res) => {
 router.patch("/profile", requireAuth, async (req, res) => {
   const { photoURL } = req.body;
 
-  if (typeof photoURL !== "string" || !photoURL.trim() || photoURL.length > 2048) {
+  if (
+    typeof photoURL !== "string" ||
+    !photoURL.trim() ||
+    photoURL.length > 2048
+  ) {
     return res.status(400).json({ message: "Choose a valid profile photo." });
   }
 
@@ -175,7 +205,10 @@ router.patch("/profile", requireAuth, async (req, res) => {
   req.user.photoURL = photo.toString();
   await req.user.save();
 
-  return res.json({ message: "Your profile photo has been updated.", user: publicUser(req.user) });
+  return res.json({
+    message: "Your profile photo has been updated.",
+    user: publicUser(req.user),
+  });
 });
 
 router.get("/me", (req, res, next) => {

@@ -12,7 +12,11 @@ const studioCategories = [
 
 const reviewSchema = new mongoose.Schema(
   {
-    author: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    author: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     authorName: { type: String, required: true, trim: true },
     rating: { type: Number, required: true, min: 1, max: 5 },
     comment: { type: String, required: true, trim: true, maxlength: 1000 },
@@ -32,7 +36,11 @@ const studioSchema = new mongoose.Schema(
     imageURL: { type: String, required: true, trim: true },
     amenities: { type: [String], default: [] },
     overview: { type: String, required: true, trim: true, maxlength: 5000 },
-    owner: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    owner: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     ownerEmail: { type: String, required: true, lowercase: true, trim: true },
     ownerName: { type: String, required: true, trim: true },
     bookingLockToken: { type: String, select: false },

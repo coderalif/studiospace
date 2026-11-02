@@ -20,7 +20,9 @@ app.use(
     origin(origin, callback) {
       const isAllowed = !origin || allowedOrigins.includes(origin);
       callback(
-        isAllowed ? null : new Error("This website is not allowed to access the API."),
+        isAllowed
+          ? null
+          : new Error("This website is not allowed to access the API."),
         isAllowed,
       );
     },

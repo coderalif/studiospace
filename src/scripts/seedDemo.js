@@ -18,9 +18,11 @@ const sampleStudios = [
     securityDeposit: 100,
     maxCapacity: 8,
     location: "East Austin, Austin",
-    imageURL: "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1400&q=85",
+    imageURL:
+      "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1400&q=85",
     amenities: ["Natural light", "Wi-Fi", "Makeup area", "Parking"],
-    overview: "A bright, plant-filled studio with big south-facing windows, easy load-in, and plenty of room to make portraits, products, or something entirely your own.",
+    overview:
+      "A bright, plant-filled studio with big south-facing windows, easy load-in, and plenty of room to make portraits, products, or something entirely your own.",
     rating: 4.9,
   },
   {
@@ -30,9 +32,11 @@ const sampleStudios = [
     securityDeposit: 250,
     maxCapacity: 24,
     location: "Echo Park, Los Angeles",
-    imageURL: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=1400&q=85",
+    imageURL:
+      "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=1400&q=85",
     amenities: ["Lighting equipment", "Green room", "Wi-Fi", "Parking"],
-    overview: "A versatile production stage with generous ceiling height, flexible lighting, and a quiet green room for the moments between takes.",
+    overview:
+      "A versatile production stage with generous ceiling height, flexible lighting, and a quiet green room for the moments between takes.",
     rating: 4.8,
   },
   {
@@ -42,9 +46,16 @@ const sampleStudios = [
     securityDeposit: 50,
     maxCapacity: 6,
     location: "Brooklyn, New York",
-    imageURL: "https://images.unsplash.com/photo-1590602847861-f357a9332bbc?auto=format&fit=crop&w=1400&q=85",
-    amenities: ["Soundproofing", "Wi-Fi", "Air conditioning", "Furniture included"],
-    overview: "A comfortable, acoustically treated room set up for thoughtful conversations, remote interviews, and the kind of ideas that sound even better out loud.",
+    imageURL:
+      "https://images.unsplash.com/photo-1590602847861-f357a9332bbc?auto=format&fit=crop&w=1400&q=85",
+    amenities: [
+      "Soundproofing",
+      "Wi-Fi",
+      "Air conditioning",
+      "Furniture included",
+    ],
+    overview:
+      "A comfortable, acoustically treated room set up for thoughtful conversations, remote interviews, and the kind of ideas that sound even better out loud.",
     rating: 4.9,
   },
   {
@@ -54,9 +65,11 @@ const sampleStudios = [
     securityDeposit: 150,
     maxCapacity: 5,
     location: "Mount Pleasant, Vancouver",
-    imageURL: "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=1400&q=85",
+    imageURL:
+      "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=1400&q=85",
     amenities: ["Soundproofing", "Air conditioning", "Kitchen", "Wi-Fi"],
-    overview: "A warm, well-loved recording room with a focused control space and a comfortable live room for tracking, writing, or finding the sound of your next song.",
+    overview:
+      "A warm, well-loved recording room with a focused control space and a comfortable live room for tracking, writing, or finding the sound of your next song.",
     rating: 4.7,
   },
   {
@@ -66,9 +79,16 @@ const sampleStudios = [
     securityDeposit: 50,
     maxCapacity: 12,
     location: "Mission District, San Francisco",
-    imageURL: "https://images.unsplash.com/photo-1452860606245-08befc0ff44b?auto=format&fit=crop&w=1400&q=85",
-    amenities: ["Natural light", "Kitchen", "Accessible entrance", "Furniture included"],
-    overview: "A welcoming workroom with big tables, good light, and space to teach, prototype, gather, and leave the room a little more interesting than you found it.",
+    imageURL:
+      "https://images.unsplash.com/photo-1452860606245-08befc0ff44b?auto=format&fit=crop&w=1400&q=85",
+    amenities: [
+      "Natural light",
+      "Kitchen",
+      "Accessible entrance",
+      "Furniture included",
+    ],
+    overview:
+      "A welcoming workroom with big tables, good light, and space to teach, prototype, gather, and leave the room a little more interesting than you found it.",
     rating: 4.8,
   },
   {
@@ -78,9 +98,11 @@ const sampleStudios = [
     securityDeposit: 50,
     maxCapacity: 10,
     location: "River North, Chicago",
-    imageURL: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=1400&q=85",
+    imageURL:
+      "https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=1400&q=85",
     amenities: ["Natural light", "Kitchen", "Parking", "Accessible entrance"],
-    overview: "A hands-on art room with generous work surfaces and shelves for the tools of the trade. Come paint, sketch, build, and make a happy mess.",
+    overview:
+      "A hands-on art room with generous work surfaces and shelves for the tools of the trade. Come paint, sketch, build, and make a happy mess.",
     rating: 4.6,
   },
 ];
@@ -113,11 +135,18 @@ async function seedDemo() {
         ownerEmail: user.email,
         ownerName: user.name,
       },
-      { new: true, upsert: true, runValidators: true, setDefaultsOnInsert: true },
+      {
+        new: true,
+        upsert: true,
+        runValidators: true,
+        setDefaultsOnInsert: true,
+      },
     );
   }
 
-  console.log(`Created the local demo account and ${sampleStudios.length} sample studios.`);
+  console.log(
+    `Created the local demo account and ${sampleStudios.length} sample studios.`,
+  );
   console.log(`Demo email: ${demoEmail}`);
   console.log(`Demo password: ${demoPassword}`);
 }

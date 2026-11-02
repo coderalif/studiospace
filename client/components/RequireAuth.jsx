@@ -11,11 +11,16 @@ export function RequireAuth({ children }) {
 
   useEffect(() => {
     // Remember the requested page so sign-in can send the guest back to it.
-    if (!authLoading && !user) router.replace(`/login?next=${encodeURIComponent(pathname)}`);
+    if (!authLoading && !user)
+      router.replace(`/login?next=${encodeURIComponent(pathname)}`);
   }, [authLoading, user, router, pathname]);
 
   if (authLoading || !user) {
-    return <div className="page-loading"><span className="spinner" /> Getting your space ready…</div>;
+    return (
+      <div className="page-loading">
+        <span className="spinner" /> Getting your space ready…
+      </div>
+    );
   }
 
   return children;
