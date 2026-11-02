@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Aperture, ArrowLeft, ArrowRight, Eye, EyeOff, LockKeyhole, Mail, UserRound } from "lucide-react";
 import Script from "next/script";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { useAuth } from "../../components/AppProviders";
 import { api } from "../../lib/api";
@@ -14,10 +14,12 @@ const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 export default function RegisterPage() {
   const router = useRouter();
   const { setUser } = useAuth();
+  const googleButtonRef = useRef(null);
   const [form, setForm] = useState({ name: "", email: "", photoURL: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [busy, setBusy] = useState(false);
   const [passwordMessage, setPasswordMessage] = useState("");
+  const [googleReady, setGoogleReady] = useState(false);
 
   function change(field, value) {
     setForm((current) => ({ ...current, [field]: value }));
@@ -57,8 +59,19 @@ export default function RegisterPage() {
   }
 
   function initGoogle() {
-    if (!window.google?.accounts?.id || !GOOGLE_CLIENT_ID) return;
+    if (!window.google?.accounts?.id || !GOOGLE_CLIENT_ID || !googleButtonRef.current || googleButtonRef.current.dataset.googleReady) return;
     window.google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: ({ credential }) => googleLogin(credential) });
+    const width = Math.min(Math.max(Math.floor(googleButtonRef.current.clientWidth), 120), 400);
+    window.google.accounts.id.renderButton(googleButtonRef.current, {
+      theme: "outline",
+      size: "large",
+      text: "continue_with",
+      shape: "rectangular",
+      logo_alignment: "left",
+      width,
+    });
+    googleButtonRef.current.dataset.googleReady = "true";
+    setGoogleReady(true);
   }
 
   function handleGoogleClick() {
@@ -67,12 +80,12 @@ export default function RegisterPage() {
       toast.error("Google sign-in is still loading. Please try again.");
       return;
     }
-    window.google.accounts.id.prompt();
+    initGoogle();
   }
 
   return (
     <>
-      <Script src="https://accounts.google.com/gsi/client" strategy="afterInteractive" onLoad={initGoogle} />
+      <Script src="https://accounts.google.com/gsi/client" strategy="afterInteractive" onReady={initGoogle} />
       <div className="auth-page">
         <div className="auth-visual auth-visual-register">
           <Link href="/" className="brand auth-brand"><span className="brand-mark"><Aperture size={22} /></span><span>studio<span className="brand-light">space</span></span></Link>
@@ -89,7 +102,8 @@ export default function RegisterPage() {
             <label>Password<div className="input-with-icon"><LockKeyhole size={17} /><input type={showPassword ? "text" : "password"} autoComplete="new-password" required minLength={6} value={form.password} onChange={(event) => change("password", event.target.value)} placeholder="At least 6 characters" /><button className="input-icon-action" type="button" onClick={() => setShowPassword(!showPassword)} aria-label={showPassword ? "Hide password" : "Show password"}>{showPassword ? <EyeOff size={17} /> : <Eye size={17} />}</button></div><span className={`password-hint ${passwordMessage ? "has-error" : form.password ? "is-valid" : ""}`}>{passwordMessage || "At least 6 characters, with an uppercase and lowercase letter."}</span></label>
             <button className="button button-dark auth-submit" disabled={busy || Boolean(passwordMessage) || form.password.length === 0}>{busy ? "Creating your account…" : "Create account"} <ArrowRight size={17} /></button>
             <div className="auth-divider"><span />or<span /></div>
-            <button className="button button-outline google-button" type="button" onClick={handleGoogleClick}><span className="google-g">G</span> Continue with Google</button>
+            <button className="button button-outline google-button" type="button" onClick={handleGoogleClick} style={{ display: googleReady ? "none" : undefined }}><span className="google-g">G</span> Continue with Google</button>
+            <div className={`google-signin-widget${googleReady ? " is-ready" : ""}`} ref={googleButtonRef} />
             <p className="auth-terms">By joining, you agree to our <Link href="/terms">Terms</Link> and <Link href="/privacy">Privacy Policy</Link>.</p>
           </form>
         </div>

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Aperture, ArrowLeft, ArrowRight, Eye, EyeOff, LockKeyhole, Mail } from "lucide-react";
 import Script from "next/script";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useState } from "react";
+import { Suspense, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useAuth } from "../../components/AppProviders";
 import { api } from "../../lib/api";
@@ -15,10 +15,12 @@ function LoginForm() {
   const router = useRouter();
   const params = useSearchParams();
   const { setUser } = useAuth();
+  const googleButtonRef = useRef(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [googleReady, setGoogleReady] = useState(false);
 
   async function submit(event) {
     event.preventDefault();
@@ -48,8 +50,19 @@ function LoginForm() {
   }
 
   function initGoogle() {
-    if (!window.google?.accounts?.id || !GOOGLE_CLIENT_ID) return;
+    if (!window.google?.accounts?.id || !GOOGLE_CLIENT_ID || !googleButtonRef.current || googleButtonRef.current.dataset.googleReady) return;
     window.google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: ({ credential }) => googleLogin(credential) });
+    const width = Math.min(Math.max(Math.floor(googleButtonRef.current.clientWidth), 120), 400);
+    window.google.accounts.id.renderButton(googleButtonRef.current, {
+      theme: "outline",
+      size: "large",
+      text: "continue_with",
+      shape: "rectangular",
+      logo_alignment: "left",
+      width,
+    });
+    googleButtonRef.current.dataset.googleReady = "true";
+    setGoogleReady(true);
   }
 
   function handleGoogleClick() {
@@ -61,12 +74,12 @@ function LoginForm() {
       toast.error("Google sign-in is still loading. Please try again.");
       return;
     }
-    window.google.accounts.id.prompt();
+    initGoogle();
   }
 
   return (
     <>
-      <Script src="https://accounts.google.com/gsi/client" strategy="afterInteractive" onLoad={initGoogle} />
+      <Script src="https://accounts.google.com/gsi/client" strategy="afterInteractive" onReady={initGoogle} />
       <div className="auth-page">
         <div className="auth-visual auth-visual-login">
           <Link href="/" className="brand auth-brand"><span className="brand-mark"><Aperture size={22} /></span><span>studio<span className="brand-light">space</span></span></Link>
@@ -82,7 +95,8 @@ function LoginForm() {
             <div className="auth-forgot"><span>Forgot your password? Contact your workspace administrator.</span></div>
             <button className="button button-dark auth-submit" disabled={busy}>{busy ? "Signing you in…" : "Sign in"} <ArrowRight size={17} /></button>
             <div className="auth-divider"><span />or<span /></div>
-            <button className="button button-outline google-button" type="button" onClick={handleGoogleClick}><span className="google-g">G</span> Continue with Google</button>
+            <button className="button button-outline google-button" type="button" onClick={handleGoogleClick} style={{ display: googleReady ? "none" : undefined }}><span className="google-g">G</span> Continue with Google</button>
+            <div className={`google-signin-widget${googleReady ? " is-ready" : ""}`} ref={googleButtonRef} />
             <p className="auth-terms">By continuing, you agree to our <Link href="/terms">Terms</Link> and <Link href="/privacy">Privacy Policy</Link>.</p>
           </form>
         </div>
