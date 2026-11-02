@@ -25,6 +25,16 @@ function StudiosContent() {
   const [mobileFilters, setMobileFilters] = useState(false);
 
   useEffect(() => {
+    const queryPage = Number.parseInt(searchParams.get("page"), 10);
+    const querySort = searchParams.get("sort");
+    setCategory(searchParams.get("category") || "");
+    setPage(Number.isInteger(queryPage) && queryPage > 0 ? queryPage : 1);
+    setSearch(searchParams.get("search") || "");
+    setLocation(searchParams.get("location") || "");
+    setSort(["rating", "price-low", "price-high"].includes(querySort) ? querySort : "newest");
+  }, [searchParams]);
+
+  useEffect(() => {
     // Refetch when the guest changes the category, search, or location filters.
     let active = true;
     setLoading(true);
@@ -58,29 +68,35 @@ function StudiosContent() {
     return new Date(b.createdAt) - new Date(a.createdAt);
   });
 
+  function updateQuery(key, value, resetPage = true) {
+    const query = new URLSearchParams(searchParams.toString());
+    if (value) query.set(key, value);
+    else query.delete(key);
+    if (resetPage && key !== "page") {
+      query.delete("page");
+      setPage(1);
+    }
+    router.replace(`/studios${query.size ? `?${query}` : ""}`, { scroll: false });
+  }
+
   function chooseCategory(value) {
     setCategory(value);
-    setPage(1);
-    const query = new URLSearchParams(searchParams.toString());
-    if (value) query.set("category", value);
-    else query.delete("category");
-    query.delete("page");
-    router.replace(`/studios${query.size ? `?${query}` : ""}`, { scroll: false });
+    updateQuery("category", value);
   }
 
   function choosePage(value) {
     setPage(value);
-    const query = new URLSearchParams(searchParams.toString());
-    if (value > 1) query.set("page", String(value));
-    else query.delete("page");
-    router.replace(`/studios${query.size ? `?${query}` : ""}`, { scroll: false });
+    updateQuery("page", value > 1 ? String(value) : "", false);
   }
 
-  function resetPage() {
+  function clearFilters() {
+    setSearch("");
+    setLocation("");
+    setSort("newest");
+    setCategory("");
     setPage(1);
-    if (!searchParams.has("page")) return;
     const query = new URLSearchParams(searchParams.toString());
-    query.delete("page");
+    ["category", "location", "page", "search", "sort"].forEach((key) => query.delete(key));
     router.replace(`/studios${query.size ? `?${query}` : ""}`, { scroll: false });
   }
 
@@ -94,16 +110,16 @@ function StudiosContent() {
       <div className="studio-toolbar">
         <div className="search-field">
           <Search size={18} />
-          <input value={search} onChange={(event) => { setSearch(event.target.value); resetPage(); }} placeholder="Try “sunlit photo studio”" aria-label="Search studios" />
-          {search && <button aria-label="Clear search" onClick={() => { setSearch(""); resetPage(); }}><X size={15} /></button>}
+          <input value={search} onChange={(event) => { setSearch(event.target.value); updateQuery("search", event.target.value); }} placeholder="Try “sunlit photo studio”" aria-label="Search studios" />
+          {search && <button aria-label="Clear search" onClick={() => { setSearch(""); updateQuery("search", ""); }}><X size={15} /></button>}
         </div>
         <div className="search-field location-field">
           <Search size={16} />
-          <input value={location} onChange={(event) => { setLocation(event.target.value); resetPage(); }} placeholder="City or neighborhood" aria-label="Filter by location" />
-          {location && <button aria-label="Clear location" onClick={() => { setLocation(""); resetPage(); }}><X size={15} /></button>}
+          <input value={location} onChange={(event) => { setLocation(event.target.value); updateQuery("location", event.target.value); }} placeholder="City or neighborhood" aria-label="Filter by location" />
+          {location && <button aria-label="Clear location" onClick={() => { setLocation(""); updateQuery("location", ""); }}><X size={15} /></button>}
         </div>
         <div className="sort-field"><ArrowDownUp size={15} />
-          <select value={sort} onChange={(event) => setSort(event.target.value)} aria-label="Sort studios">
+          <select value={sort} onChange={(event) => { setSort(event.target.value); updateQuery("sort", event.target.value === "newest" ? "" : event.target.value, false); }} aria-label="Sort studios">
             <option value="newest">Newest first</option><option value="rating">Top rated</option><option value="price-low">Price: low to high</option><option value="price-high">Price: high to low</option>
           </select>
         </div>
@@ -124,7 +140,7 @@ function StudiosContent() {
               <button className="button button-outline" type="button" onClick={() => choosePage(page + 1)} disabled={page >= pagination.pages}>Next <ChevronRight size={16} /></button>
             </nav>}
           </> :
-            <div className="empty-state"><div className="empty-icon">✳</div><h2>No spaces found just yet.</h2><p>Try a different search, or be the first to share a space in this category.</p><div className="empty-actions"><button className="button button-outline" onClick={() => { setSearch(""); setLocation(""); chooseCategory(""); }}>Clear filters</button><Link className="button button-dark" href="/add-studio">List a studio <ArrowRight size={16} /></Link></div></div>}
+            <div className="empty-state"><div className="empty-icon">✳</div><h2>No spaces found just yet.</h2><p>Try a different search, or be the first to share a space in this category.</p><div className="empty-actions"><button className="button button-outline" onClick={clearFilters}>Clear filters</button><Link className="button button-dark" href="/add-studio">List a studio <ArrowRight size={16} /></Link></div></div>}
     </div>
   );
 }
