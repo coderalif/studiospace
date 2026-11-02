@@ -282,8 +282,6 @@ em { font-family: "DM Serif Display", Georgia, serif; font-weight: 400; }
 .auth-divider span { height: 1px; flex: 1; background: var(--line); }
 .google-button { width: 100%; min-height: 46px; font-size: 11px; }
 .google-g { color: #4285f4; font-size: 16px; font-weight: 700; }
-.google-signin-widget { width: 100%; }
-.google-signin-widget.is-ready { display: flex; justify-content: center; min-height: 40px; }
 .auth-terms { margin: 19px 0 0; color: #92978d; font-size: 9px; line-height: 1.7; text-align: center; }
 .register-form { padding-block: 18px; }
 .register-form > p:not(.auth-terms) { margin-bottom: 13px; }
