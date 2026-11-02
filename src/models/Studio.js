@@ -35,6 +35,8 @@ const studioSchema = new mongoose.Schema(
     owner: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     ownerEmail: { type: String, required: true, lowercase: true, trim: true },
     ownerName: { type: String, required: true, trim: true },
+    bookingLockToken: { type: String, select: false },
+    bookingLockUntil: { type: Date, select: false },
     rating: { type: Number, default: 0, min: 0, max: 5 },
     reviews: { type: [reviewSchema], default: [] },
   },

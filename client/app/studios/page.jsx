@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
-import { ArrowDownUp, ArrowRight, Search, SlidersHorizontal, X } from "lucide-react";
+import { ArrowDownUp, ArrowRight, ChevronLeft, ChevronRight, Search, SlidersHorizontal, X } from "lucide-react";
 import { Suspense, useEffect, useState } from "react";
 import { api } from "../../lib/api";
 import { StudioCard, StudioCardSkeleton } from "../../components/StudioCard";
@@ -12,7 +12,10 @@ function StudiosContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const initialCategory = searchParams.get("category") || "";
+  const requestedPage = Number.parseInt(searchParams.get("page"), 10);
   const [studios, setStudios] = useState([]);
+  const [pagination, setPagination] = useState({ page: 1, limit: 12, total: 0, pages: 0 });
+  const [page, setPage] = useState(Number.isInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1);
   const [category, setCategory] = useState(initialCategory);
   const [search, setSearch] = useState(searchParams.get("search") || "");
   const [location, setLocation] = useState("");
@@ -26,17 +29,26 @@ function StudiosContent() {
     let active = true;
     setLoading(true);
     setError("");
-    const query = new URLSearchParams({ limit: "50" });
+    const query = new URLSearchParams({ limit: "12", page: String(page) });
     if (category) query.set("category", category);
     if (search.trim()) query.set("search", search.trim());
     if (location.trim()) query.set("location", location.trim());
 
     api(`/studios?${query}`)
-      .then(({ studios: data }) => { if (active) setStudios(data); })
+      .then(({ studios: data, pagination: pageData }) => {
+        if (active) {
+          if (pageData.pages ? page > pageData.pages : page > 1) {
+            choosePage(pageData.pages || 1);
+            return;
+          }
+          setStudios(data);
+          setPagination(pageData);
+        }
+      })
       .catch((requestError) => { if (active) setError(requestError.message); })
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
-  }, [category, search, location]);
+  }, [category, search, location, page]);
 
   // Sorting is local because the filtered result set is already loaded.
   const sortedStudios = [...studios].sort((a, b) => {
@@ -48,9 +60,27 @@ function StudiosContent() {
 
   function chooseCategory(value) {
     setCategory(value);
+    setPage(1);
     const query = new URLSearchParams(searchParams.toString());
     if (value) query.set("category", value);
     else query.delete("category");
+    query.delete("page");
+    router.replace(`/studios${query.size ? `?${query}` : ""}`, { scroll: false });
+  }
+
+  function choosePage(value) {
+    setPage(value);
+    const query = new URLSearchParams(searchParams.toString());
+    if (value > 1) query.set("page", String(value));
+    else query.delete("page");
+    router.replace(`/studios${query.size ? `?${query}` : ""}`, { scroll: false });
+  }
+
+  function resetPage() {
+    setPage(1);
+    if (!searchParams.has("page")) return;
+    const query = new URLSearchParams(searchParams.toString());
+    query.delete("page");
     router.replace(`/studios${query.size ? `?${query}` : ""}`, { scroll: false });
   }
 
@@ -64,13 +94,13 @@ function StudiosContent() {
       <div className="studio-toolbar">
         <div className="search-field">
           <Search size={18} />
-          <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Try “sunlit photo studio”" aria-label="Search studios" />
-          {search && <button aria-label="Clear search" onClick={() => setSearch("")}><X size={15} /></button>}
+          <input value={search} onChange={(event) => { setSearch(event.target.value); resetPage(); }} placeholder="Try “sunlit photo studio”" aria-label="Search studios" />
+          {search && <button aria-label="Clear search" onClick={() => { setSearch(""); resetPage(); }}><X size={15} /></button>}
         </div>
         <div className="search-field location-field">
           <Search size={16} />
-          <input value={location} onChange={(event) => setLocation(event.target.value)} placeholder="City or neighborhood" aria-label="Filter by location" />
-          {location && <button aria-label="Clear location" onClick={() => setLocation("")}><X size={15} /></button>}
+          <input value={location} onChange={(event) => { setLocation(event.target.value); resetPage(); }} placeholder="City or neighborhood" aria-label="Filter by location" />
+          {location && <button aria-label="Clear location" onClick={() => { setLocation(""); resetPage(); }}><X size={15} /></button>}
         </div>
         <div className="sort-field"><ArrowDownUp size={15} />
           <select value={sort} onChange={(event) => setSort(event.target.value)} aria-label="Sort studios">
@@ -83,10 +113,17 @@ function StudiosContent() {
         <button className={!category ? "active" : ""} onClick={() => chooseCategory("")}>All spaces</button>
         {studioCategories.map((item) => <button key={item} className={category === item ? "active" : ""} onClick={() => chooseCategory(item)}>{item}</button>)}
       </div>
-      <div className="results-meta"><span>{loading ? "Finding your space…" : `${sortedStudios.length} ${sortedStudios.length === 1 ? "space" : "spaces"} to explore`}</span><Link href="/add-studio">Have a space to share? <strong>List it <ArrowRight size={14} /></strong></Link></div>
+      <div className="results-meta"><span>{loading ? "Finding your space…" : `${pagination.total} ${pagination.total === 1 ? "space" : "spaces"} to explore`}</span><Link href="/add-studio">Have a space to share? <strong>List it <ArrowRight size={14} /></strong></Link></div>
       {error ? <div className="empty-state"><div className="empty-icon">!</div><h2>We couldn’t reach the studio directory.</h2><p>{error}</p><button className="button button-dark" onClick={() => window.location.reload()}>Try again</button></div> :
         loading ? <div className="studio-grid">{Array.from({ length: 6 }).map((_, i) => <StudioCardSkeleton key={i} />)}</div> :
-          sortedStudios.length ? <div className="studio-grid">{sortedStudios.map((studio) => <StudioCard key={studio._id} studio={studio} />)}</div> :
+          sortedStudios.length ? <>
+            <div className="studio-grid">{sortedStudios.map((studio) => <StudioCard key={studio._id} studio={studio} />)}</div>
+            {pagination.pages > 1 && <nav className="studio-pagination" aria-label="Studio directory pages">
+              <button className="button button-outline" type="button" onClick={() => choosePage(page - 1)} disabled={page <= 1}><ChevronLeft size={16} /> Previous</button>
+              <span>Page {pagination.page} of {pagination.pages}</span>
+              <button className="button button-outline" type="button" onClick={() => choosePage(page + 1)} disabled={page >= pagination.pages}>Next <ChevronRight size={16} /></button>
+            </nav>}
+          </> :
             <div className="empty-state"><div className="empty-icon">✳</div><h2>No spaces found just yet.</h2><p>Try a different search, or be the first to share a space in this category.</p><div className="empty-actions"><button className="button button-outline" onClick={() => { setSearch(""); setLocation(""); chooseCategory(""); }}>Clear filters</button><Link className="button button-dark" href="/add-studio">List a studio <ArrowRight size={16} /></Link></div></div>}
     </div>
   );

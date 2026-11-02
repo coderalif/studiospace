@@ -54,7 +54,7 @@ StudioSpace is a peer-to-peer marketplace for creative studios and production sp
 For a client hosted on a different site, configure `COOKIE_SAME_SITE=none` and `COOKIE_SECURE=true` over HTTPS. Keep those cookie settings and all API secrets in the hosting provider's environment settings.
 For local development, the API's `CLIENT_URL` should include `http://localhost:3000`.
 
-For the deployed Vercel client, set `NEXT_PUBLIC_API_URL` to `https://studiospace-j8pk.vercel.app/api`. To enable Google sign-in, set `NEXT_PUBLIC_GOOGLE_CLIENT_ID` in the Vercel client project's Production environment and `GOOGLE_CLIENT_ID` in the API project's environment to the same Google OAuth Web client ID, then redeploy both projects. Add `https://studiospace-pearl.vercel.app` to the OAuth client's authorized JavaScript origins.
+For the deployed Vercel client, `NEXT_PUBLIC_API_URL` is set to `https://studiospace-j8pk.vercel.app/api`. To enable Google sign-in, set `NEXT_PUBLIC_GOOGLE_CLIENT_ID` in the Vercel client project's Production environment and `GOOGLE_CLIENT_ID` in the API project's environment to the same Google OAuth Web client ID, then redeploy both projects. Add `https://studiospace-pearl.vercel.app` to that OAuth client's authorized JavaScript origins.
 
 ## Main API routes
 
@@ -88,7 +88,7 @@ Studio browsing accepts `category`, `location`, `search`, `page`, and `limit` qu
 
 ## Examiner test account
 
-There is no public deployment yet. To create a local examiner account and six sample studios, run `npm run seed:demo` from the project root while `NODE_ENV=development` and MongoDB are configured. The command refuses to run in production.
+The live deployment is available at the client and API URLs listed above. To create a local examiner account and six sample studios, run `npm run seed:demo` from the project root while `NODE_ENV=development` and MongoDB are configured. The command refuses to run in production.
 
 - Examiner email: `examiner@studiospace.local`
 - Examiner password: `StudioSpace2026!`

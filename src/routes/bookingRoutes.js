@@ -1,5 +1,6 @@
 const { Router } = require("express");
 const mongoose = require("mongoose");
+const { randomUUID } = require("crypto");
 const PDFDocument = require("pdfkit");
 const Booking = require("../models/Booking");
 const requireAuth = require("../middleware/requireAuth");
@@ -27,6 +28,49 @@ async function findConfirmedOverlap(studioId, startAt, endAt, ignoredBookingId) 
   }
 
   return Booking.exists(filter);
+}
+
+async function withStudioBookingLock(studioId, action) {
+  const token = randomUUID();
+  const waitUntil = Date.now() + 10_000;
+
+  while (Date.now() < waitUntil) {
+    const now = new Date();
+    const lockedStudio = await Studio.findOneAndUpdate(
+      {
+        _id: studioId,
+        $or: [
+          { bookingLockUntil: { $lte: now } },
+          { bookingLockUntil: { $exists: false } },
+        ],
+      },
+      {
+        $set: {
+          bookingLockToken: token,
+          bookingLockUntil: new Date(now.getTime() + 60_000),
+        },
+      },
+      { new: true, timestamps: false },
+    ).select("_id");
+
+    if (lockedStudio) {
+      try {
+        return await action();
+      } finally {
+        await Studio.updateOne(
+          { _id: studioId, bookingLockToken: token },
+          { $unset: { bookingLockToken: 1, bookingLockUntil: 1 } },
+          { timestamps: false },
+        );
+      }
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+
+  const error = new Error("Another booking update is in progress. Please try again.");
+  error.status = 409;
+  throw error;
 }
 
 router.post("/", async (req, res) => {
@@ -156,46 +200,53 @@ router.patch("/:id/status", async (req, res) => {
     return res.status(400).json({ message: "The booking ID is not valid." });
   }
 
-  const booking = await Booking.findById(req.params.id);
-  if (!booking) {
+  const requestedBooking = await Booking.findById(req.params.id);
+  if (!requestedBooking) {
     return res.status(404).json({ message: "Booking not found." });
   }
 
-  const studio = await Studio.findById(booking.studio);
-  if (!studio || !studio.owner.equals(req.user._id)) {
-    return res.status(403).json({ message: "Only the studio host can update this booking." });
-  }
-
-  const { status } = req.body;
-  // Limit status changes to the booking's next valid step.
-  const allowedTransitions = {
-    Pending: ["Confirmed", "Cancelled"],
-    Confirmed: ["Completed", "Cancelled"],
-  };
-  if (!allowedTransitions[booking.status]?.includes(status)) {
-    return res.status(400).json({ message: "That booking status change is not allowed." });
-  }
-
-  if (status === "Confirmed") {
-    const overlap = await findConfirmedOverlap(
-      booking.studio,
-      booking.startAt,
-      booking.endAt,
-      booking._id,
-    );
-    if (overlap) {
-      return res.status(409).json({
-        message: "Another confirmed booking already uses this time slot.",
-      });
+  return withStudioBookingLock(requestedBooking.studio, async () => {
+    const booking = await Booking.findById(req.params.id);
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found." });
     }
-  }
-  if (status === "Completed" && booking.endAt > new Date()) {
-    return res.status(400).json({ message: "A booking can only be completed after its end time." });
-  }
 
-  booking.status = status;
-  await booking.save();
-  return res.json({ message: `Booking status changed to ${status}.`, booking });
+    const studio = await Studio.findById(booking.studio);
+    if (!studio || !studio.owner.equals(req.user._id)) {
+      return res.status(403).json({ message: "Only the studio host can update this booking." });
+    }
+
+    const { status } = req.body;
+    // Limit status changes to the booking's next valid step.
+    const allowedTransitions = {
+      Pending: ["Confirmed", "Cancelled"],
+      Confirmed: ["Completed", "Cancelled"],
+    };
+    if (!allowedTransitions[booking.status]?.includes(status)) {
+      return res.status(400).json({ message: "That booking status change is not allowed." });
+    }
+
+    if (status === "Confirmed") {
+      const overlap = await findConfirmedOverlap(
+        booking.studio,
+        booking.startAt,
+        booking.endAt,
+        booking._id,
+      );
+      if (overlap) {
+        return res.status(409).json({
+          message: "Another confirmed booking already uses this time slot.",
+        });
+      }
+    }
+    if (status === "Completed" && booking.endAt > new Date()) {
+      return res.status(400).json({ message: "A booking can only be completed after its end time." });
+    }
+
+    booking.status = status;
+    await booking.save();
+    return res.json({ message: `Booking status changed to ${status}.`, booking });
+  });
 });
 
 router.patch("/:id/cancel", async (req, res) => {
@@ -203,18 +254,25 @@ router.patch("/:id/cancel", async (req, res) => {
     return res.status(400).json({ message: "The booking ID is not valid." });
   }
 
-  const booking = await Booking.findOne({ _id: req.params.id, renter: req.user._id });
-  if (!booking) {
+  const requestedBooking = await Booking.findOne({ _id: req.params.id, renter: req.user._id });
+  if (!requestedBooking) {
     return res.status(404).json({ message: "Booking not found." });
   }
-  if (booking.status !== "Pending") {
-    return res.status(409).json({ message: "Only pending bookings can be cancelled by the guest." });
-  }
 
-  // Guests may cancel their own pending request, but not a confirmed booking.
-  booking.status = "Cancelled";
-  await booking.save();
-  return res.json({ message: "Booking cancelled.", booking });
+  return withStudioBookingLock(requestedBooking.studio, async () => {
+    const booking = await Booking.findOne({ _id: req.params.id, renter: req.user._id });
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found." });
+    }
+    if (booking.status !== "Pending") {
+      return res.status(409).json({ message: "Only pending bookings can be cancelled by the guest." });
+    }
+
+    // Guests may cancel their own pending request, but not a confirmed booking.
+    booking.status = "Cancelled";
+    await booking.save();
+    return res.json({ message: "Booking cancelled.", booking });
+  });
 });
 
 module.exports = router;
