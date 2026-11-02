@@ -325,8 +325,10 @@ em { font-family: "DM Serif Display", Georgia, serif; font-weight: 400; }
 .amenity-choice input:focus-visible + span { outline: 2px solid var(--green); outline-offset: 2px; }
 .host-readonly { display: flex; flex-direction: column; gap: 5px; margin-top: 28px; padding: 14px 15px; border-left: 3px solid var(--lime-strong); background: var(--surface-soft); }
 .host-readonly span { color: var(--green); font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
-.host-readonly strong { font-size: 11px; }
 .host-readonly small { color: var(--ink-soft); font-size: 9px; }
+.host-readonly-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.host-readonly-fields label { display: grid; gap: 5px; color: var(--ink-soft); font-size: 10px; }
+.host-readonly-fields input { min-width: 0; padding: 9px 10px; border: 1px solid var(--line); border-radius: 2px; color: var(--ink-soft); background: var(--surface); font: inherit; }
 .form-submit-row { display: flex; align-items: center; justify-content: space-between; gap: 15px; margin-top: 25px; padding-top: 20px; border-top: 1px solid var(--line); }
 .form-submit-row p { margin: 0; color: var(--ink-soft); font-size: 10px; }
 
@@ -486,6 +488,7 @@ em { font-family: "DM Serif Display", Georgia, serif; font-weight: 400; }
 }
 @media (max-width: 700px) {
   .page-container, .header-inner { width: calc(100% - 36px); }
+  .host-readonly-fields { grid-template-columns: 1fr; }
   .header-inner { height: 65px; gap: 10px; }
   .brand { font-size: 18px; }
   .brand-mark { width: 31px; height: 31px; }

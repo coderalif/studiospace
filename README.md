@@ -1,8 +1,9 @@
 # StudioSpace API
 
-StudioSpace is a peer-to-peer marketplace for creative studios and production spaces. This repository includes the Express/MongoDB API and a responsive Next.js client. No public live deployment URL has been configured yet.
+StudioSpace is a peer-to-peer marketplace for creative studios and production spaces. This repository includes the Express/MongoDB API and a responsive Next.js client.
 
 **Local website:** `http://localhost:3000` (available while the frontend dev server is running).
+**Live client:** Not deployed yet. Add the public client URL here after deployment.
 
 ## Features
 
@@ -39,7 +40,7 @@ StudioSpace is a peer-to-peer marketplace for creative studios and production sp
 
 1. Install Node.js 18+ and make sure MongoDB is available locally or through MongoDB Atlas.
 2. Copy `.env.example` to `.env`.
-3. Set `MONGODB_URI` and replace `JWT_SECRET` with a long, random value. Set `CLIENT_URL` to the client origin.
+3. Set `MONGODB_URI` and replace `JWT_SECRET` with a long, random value. Set `CLIENT_URL` to the client origin. The example uses a local MongoDB database.
 4. For Google sign-in, set `GOOGLE_CLIENT_ID`. For image uploads, set `IMGBB_API_KEY`.
 5. Install backend dependencies from the project root using `npm install`.
 6. Install frontend dependencies with `npm --prefix client install`.

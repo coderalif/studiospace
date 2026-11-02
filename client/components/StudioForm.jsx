@@ -3,6 +3,7 @@
 import { ImagePlus, LoaderCircle, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useAuth } from "./AppProviders";
 import { api } from "../lib/api";
 import { amenityOptions, studioCategories } from "../lib/constants";
 
@@ -19,6 +20,7 @@ const blankStudio = {
 };
 
 export function StudioForm({ initialValue = blankStudio, onSubmit, submitLabel }) {
+  const { user } = useAuth();
   // One form handles both creating a fresh listing and editing an existing one.
   const [form, setForm] = useState({
     ...blankStudio,
@@ -110,7 +112,14 @@ export function StudioForm({ initialValue = blankStudio, onSubmit, submitLabel }
       </div>
       <div className="form-section-heading"><span>03</span><div><h2>The thoughtful details</h2><p>Help guests picture how the space will work for them.</p></div></div>
       <div className="amenity-choices">{amenityOptions.map((item) => <label key={item} className={`amenity-choice ${form.amenities.includes(item) ? "selected" : ""}`}><input type="checkbox" checked={form.amenities.includes(item)} onChange={() => toggleAmenity(item)} /><span>{item}</span></label>)}</div>
-      <div className="host-readonly"><span>Hosted by</span><strong>Verified from your signed-in account</strong><small>Your name and email are attached securely by StudioSpace.</small></div>
+      <div className="host-readonly">
+        <span>Host details</span>
+        <div className="host-readonly-fields">
+          <label>Name<input value={user?.name || ""} readOnly /></label>
+          <label>Email<input type="email" value={user?.email || ""} readOnly /></label>
+        </div>
+        <small>These details come from your signed-in account and cannot be changed here.</small>
+      </div>
       <div className="form-submit-row"><p>Good spaces deserve a good introduction. Take your time.</p><button className="button button-dark" disabled={busy || uploading}>{busy ? "Saving your space…" : submitLabel} <span>→</span></button></div>
     </form>
   );
