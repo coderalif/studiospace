@@ -18,7 +18,9 @@ import { toast } from "sonner";
 import { useAuth } from "../../components/AppProviders";
 import { api } from "../../lib/api";
 
-const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+const GOOGLE_CLIENT_ID =
+  process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ||
+  "553926041182-avnf2pbge8g9v5k4023fmlen6fatpeap.apps.googleusercontent.com";
 
 export default function RegisterPage() {
   const router = useRouter();

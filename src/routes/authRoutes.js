@@ -92,7 +92,9 @@ router.post("/login", async (req, res) => {
 
 router.post("/google", async (req, res, next) => {
   const { credential } = req.body;
-  const clientId = process.env.GOOGLE_CLIENT_ID;
+  const clientId =
+    process.env.GOOGLE_CLIENT_ID ||
+    "553926041182-avnf2pbge8g9v5k4023fmlen6fatpeap.apps.googleusercontent.com";
 
   if (!clientId) {
     return res
@@ -166,6 +168,9 @@ router.post("/google", async (req, res, next) => {
       photoURL: profile.picture || "",
       passwordHash,
     });
+  } else if (profile.picture && !user.photoURL) {
+    user.photoURL = profile.picture;
+    await user.save();
   }
 
   setAuthCookie(res, createAuthToken(user._id.toString()));

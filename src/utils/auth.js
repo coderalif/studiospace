@@ -10,21 +10,28 @@ function createAuthToken(userId) {
 // Keep the token out of browser JavaScript by using an HTTP-only cookie.
 function setAuthCookie(res, token) {
   const maxAge = 7 * 24 * 60 * 60 * 1000;
+  const isProduction =
+    process.env.NODE_ENV === "production" ||
+    process.env.COOKIE_SECURE === "true";
 
   res.cookie("studiospace_token", token, {
     httpOnly: true,
-    secure: process.env.COOKIE_SECURE === "true",
-    sameSite: process.env.COOKIE_SAME_SITE || "lax",
+    secure: isProduction,
+    sameSite: isProduction ? "none" : process.env.COOKIE_SAME_SITE || "lax",
     maxAge,
   });
 }
 
 // Use the same cookie settings when signing out so the browser removes it.
 function clearAuthCookie(res) {
+  const isProduction =
+    process.env.NODE_ENV === "production" ||
+    process.env.COOKIE_SECURE === "true";
+
   res.clearCookie("studiospace_token", {
     httpOnly: true,
-    secure: process.env.COOKIE_SECURE === "true",
-    sameSite: process.env.COOKIE_SAME_SITE || "lax",
+    secure: isProduction,
+    sameSite: isProduction ? "none" : process.env.COOKIE_SAME_SITE || "lax",
   });
 }
 

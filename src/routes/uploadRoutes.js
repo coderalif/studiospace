@@ -25,7 +25,10 @@ const upload = multer({
 });
 
 router.post("/", requireAuth, upload.single("image"), async (req, res) => {
-  if (!process.env.IMGBB_API_KEY) {
+  const apiKey =
+    process.env.IMGBB_API_KEY || "6eb974a954c5f43ec188694763ce0346";
+
+  if (!apiKey) {
     return res
       .status(503)
       .json({ message: "Image uploads are not configured yet." });
@@ -38,7 +41,7 @@ router.post("/", requireAuth, upload.single("image"), async (req, res) => {
   const form = new URLSearchParams();
   form.set("image", req.file.buffer.toString("base64"));
   const response = await fetch(
-    `https://api.imgbb.com/1/upload?key=${encodeURIComponent(process.env.IMGBB_API_KEY)}`,
+    `https://api.imgbb.com/1/upload?key=${encodeURIComponent(apiKey)}`,
     { method: "POST", body: form },
   );
   const result = await response.json();
