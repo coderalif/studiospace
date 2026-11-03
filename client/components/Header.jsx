@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Aperture, LogOut, Menu, Moon, Plus, Sun, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { api } from "../lib/api";
 import { useAuth, useTheme } from "./AppProviders";
@@ -15,6 +15,38 @@ export function Header() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  const timeoutRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
+
+  function handleMouseEnter() {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    setDropdownOpen(true);
+  }
+
+  function handleMouseLeave() {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => {
+      setDropdownOpen(false);
+    }, 300);
+  }
+
+  function handleAvatarClick() {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    setDropdownOpen((prev) => !prev);
+  }
 
   function isActive(path) {
     if (path === "/") return pathname === "/";
@@ -140,13 +172,14 @@ export function Header() {
 
                 <div
                   className="user-menu"
-                  onMouseEnter={() => setDropdownOpen(true)}
-                  onMouseLeave={() => setDropdownOpen(false)}
+                  ref={dropdownRef}
+                  onMouseEnter={handleMouseEnter}
+                  onMouseLeave={handleMouseLeave}
                 >
                   <button
                     type="button"
                     className="avatar-button"
-                    onClick={() => setDropdownOpen(!dropdownOpen)}
+                    onClick={handleAvatarClick}
                   >
                     {user.photoURL ? (
                       <img src={user.photoURL} alt={user.name || "User"} />

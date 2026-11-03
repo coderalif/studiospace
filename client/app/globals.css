@@ -315,6 +315,14 @@ em {
   display: flex;
   flex-direction: column;
 }
+.user-dropdown::before {
+  content: "";
+  position: absolute;
+  top: -12px;
+  left: 0;
+  right: 0;
+  height: 12px;
+}
 .dropdown-user {
   padding: 8px 16px 10px;
   border-bottom: 1px solid var(--line);
@@ -343,8 +351,10 @@ em {
   align-items: center;
   gap: 8px;
   width: 100%;
-  padding: 8px 16px;
+  padding: 10px 16px;
+  font-family: inherit;
   font-size: 13px;
+  font-weight: 500;
   color: #dc2626;
   background: none;
   border: 0;
