@@ -104,6 +104,13 @@ export function Header() {
             <>
               <Link
                 className="mobile-nav-link"
+                href="/profile"
+                onClick={() => setMenuOpen(false)}
+              >
+                Profile Settings
+              </Link>
+              <Link
+                className="mobile-nav-link"
                 href="/my-listings"
                 onClick={() => setMenuOpen(false)}
               >
@@ -202,6 +209,12 @@ export function Header() {
                       <strong>{user.name}</strong>
                       <small>{user.email}</small>
                     </div>
+                    <Link
+                      href="/profile"
+                      onClick={() => setDropdownOpen(false)}
+                    >
+                      Profile Settings
+                    </Link>
                     <Link
                       href="/my-listings"
                       onClick={() => setDropdownOpen(false)}
