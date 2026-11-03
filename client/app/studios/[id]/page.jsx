@@ -433,7 +433,7 @@ function StudioDetails() {
                       )
                 }
               >
-                Book this workspace <ArrowRight size={16} />
+                Book Workspace Now <ArrowRight size={16} />
               </button>
             )}
             <p className="booking-safe-note">

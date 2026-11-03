@@ -253,7 +253,7 @@ router.get("/:id", async (req, res) => {
   return res.json({ studio });
 });
 
-router.patch("/:id", requireAuth, async (req, res) => {
+async function updateStudioHandler(req, res) {
   if (!mongoose.isValidObjectId(req.params.id)) {
     return res.status(400).json({ message: "The studio ID is not valid." });
   }
@@ -279,7 +279,10 @@ router.patch("/:id", requireAuth, async (req, res) => {
   }
 
   return res.json({ message: "Studio listing updated.", studio });
-});
+}
+
+router.patch("/:id", requireAuth, updateStudioHandler);
+router.put("/:id", requireAuth, updateStudioHandler);
 
 router.delete("/:id", requireAuth, async (req, res) => {
   if (!mongoose.isValidObjectId(req.params.id)) {

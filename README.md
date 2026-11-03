@@ -1,4 +1,4 @@
-# StudioSpace API
+# StudioSpace — Peer-to-Peer Creative Workspace & Production Studio Sharing Platform
 
 StudioSpace is a peer-to-peer marketplace for creative studios and production spaces. This repository includes the Express/MongoDB API and a responsive Next.js client.
 

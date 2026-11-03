@@ -76,7 +76,7 @@ export function StudioCard({ studio, onUnsave }) {
             <strong>${money(studio.hourlyRate)}</strong> / hr
           </span>
           <Link className="card-view-link" href={`/studios/${id}`}>
-            View studio
+            View Details
           </Link>
         </div>
       </div>

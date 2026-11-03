@@ -8,10 +8,14 @@ import {
   Aperture,
   Camera,
   Clapperboard,
+  LifeBuoy,
   Mic2,
   Music2,
   Palette,
+  ShieldCheck,
   Sparkles,
+  Users,
+  Video,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -66,7 +70,6 @@ const slides = [
   },
 ];
 
-// These links preselect the matching category on the studio directory page.
 const categories = [
   {
     title: "Photo Studios",
@@ -113,7 +116,6 @@ export default function HomePage() {
   const [loadError, setLoadError] = useState("");
 
   useEffect(() => {
-    // Keep the home page's featured cards connected to the live studio collection.
     api("/studios/featured")
       .then(({ studios: data }) => setStudios(data))
       .catch((error) => setLoadError(error.message))
@@ -122,8 +124,8 @@ export default function HomePage() {
 
   return (
     <>
+      {/* Banner / Hero Slider */}
       <section className="hero">
-        {/* Swiper provides the requested autoplaying, clickable home-page slides. */}
         <Swiper
           className="hero-swiper"
           modules={[A11y, Autoplay, EffectFade]}
@@ -187,6 +189,7 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Trust Strip */}
       <section className="trust-strip">
         <div className="page-container trust-inner">
           <span>Independent spaces, extraordinary work.</span>
@@ -200,6 +203,7 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Featured Studios */}
       <section
         className="section section-featured page-container"
         id="featured"
@@ -222,7 +226,7 @@ export default function HomePage() {
           </div>
         ) : loading ? (
           <div className="studio-grid">
-            {Array.from({ length: 3 }).map((_, i) => (
+            {Array.from({ length: 6 }).map((_, i) => (
               <StudioCardSkeleton key={i} />
             ))}
           </div>
@@ -249,6 +253,7 @@ export default function HomePage() {
         )}
       </section>
 
+      {/* Browse by Studio Categories */}
       <section className="section section-categories">
         <div className="page-container">
           <div className="section-heading category-heading">
@@ -291,6 +296,7 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* How Booking Works */}
       <section
         className="section editorial-section page-container"
         id="how-it-works"
@@ -298,7 +304,7 @@ export default function HomePage() {
         <div className="editorial-image">
           <img
             src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1300&q=90"
-            alt="Sunlit creative workspace with room to make"
+            alt="Sunlit creative workspace"
             loading="lazy"
           />
           <span className="image-note">
@@ -306,37 +312,43 @@ export default function HomePage() {
           </span>
         </div>
         <div className="editorial-copy">
-          <span className="eyebrow">Make space for the good stuff</span>
+          <span className="eyebrow">How Booking Works</span>
           <h2>
             Find the room.
             <br />
             Find your <em>flow.</em>
           </h2>
           <p>
-            Forget the borrowed corner and the makeshift setup. Discover
-            independently owned creative spaces where the details are thoughtful
-            and the possibilities are wide open.
+            From finding the perfect room to wrapping your shoot, our 4-step
+            process makes studio booking effortless.
           </p>
           <div className="editorial-points">
             <div>
               <span>01</span>
               <p>
-                <strong>Find your fit</strong>Explore spaces with the tools,
-                feel, and light your project needs.
+                <strong>1. Discover Spaces</strong>Explore curated cyc walls,
+                sound stages, podcast lounges, and music suites.
               </p>
             </div>
             <div>
               <span>02</span>
               <p>
-                <strong>Meet your host</strong>Real people, well-loved spaces,
-                and a warm welcome when you arrive.
+                <strong>2. Select Shoot Hours</strong>Choose your preferred date
+                and shoot hours with clear, transparent rates.
               </p>
             </div>
             <div>
               <span>03</span>
               <p>
-                <strong>Make the thing</strong>Book your time, bring your idea,
-                and see where it takes you.
+                <strong>3. Book Instantly</strong>Send a booking request with
+                built-in double-booking prevention.
+              </p>
+            </div>
+            <div>
+              <span>04</span>
+              <p>
+                <strong>4. Create &amp; Produce</strong>Check in, connect with
+                your host, and bring your creative project to life.
               </p>
             </div>
           </div>
@@ -346,6 +358,70 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Host Guarantee & Creator Support */}
+      <section
+        className="section guarantee-section page-container"
+        id="about-us"
+      >
+        <div className="section-heading">
+          <div>
+            <span className="eyebrow">
+              Host Guarantee &amp; Creator Support
+            </span>
+            <h2>
+              Confidence in <em>every booking.</em>
+            </h2>
+          </div>
+          <p className="guarantee-intro">
+            Platform assurances designed to keep hosts, creators, and gear
+            protected.
+          </p>
+        </div>
+        <div className="guarantee-grid">
+          <div className="guarantee-item">
+            <div className="guarantee-icon">
+              <ShieldCheck size={22} />
+            </div>
+            <h3>Liability Protection</h3>
+            <p>
+              Coverage protecting hosts and guests against accidental property
+              damages during production sessions.
+            </p>
+          </div>
+          <div className="guarantee-item">
+            <div className="guarantee-icon">
+              <Users size={22} />
+            </div>
+            <h3>Verified Profiles</h3>
+            <p>
+              Verified hosts, identity checks, and authentic community reviews
+              for transparent collaborations.
+            </p>
+          </div>
+          <div className="guarantee-item">
+            <div className="guarantee-icon">
+              <Video size={22} />
+            </div>
+            <h3>Equipment Safety</h3>
+            <p>
+              Clear workspace security guidelines and deposit protections for
+              high-end cinema and audio gear.
+            </p>
+          </div>
+          <div className="guarantee-item">
+            <div className="guarantee-icon">
+              <LifeBuoy size={22} />
+            </div>
+            <h3>24/7 Host Support</h3>
+            <p>
+              Round-the-clock support standing by to help with questions,
+              rescheduling, or shoot-day assistance.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Host Callout Section */}
       <section className="host-cta">
         <div className="host-cta-image" />
         <div className="host-cta-content page-container">

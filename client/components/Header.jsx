@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { Aperture, LogOut, Menu, Moon, Plus, Sun, X } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { api } from "../lib/api";
@@ -12,111 +12,210 @@ export function Header() {
   const { user, setUser, authLoading } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const router = useRouter();
+  const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  // Show account pages only after the current session has been restored.
-  const links = [
-    ["Studios", "/studios"],
-    ["How it works", "/#how-it-works"],
-    ...(user
-      ? [
-          ["Profile settings", "/profile"],
-          ["My bookings", "/my-bookings"],
-          ["My listings", "/my-listings"],
-          ["Saved studios", "/saved-studios"],
-        ]
-      : []),
-  ];
+  function isActive(path) {
+    if (path === "/") return pathname === "/";
+    return pathname.startsWith(path);
+  }
 
-  async function logout() {
+  async function handleLogout() {
     try {
       await api("/auth/logout", { method: "POST" });
       setUser(null);
       setMenuOpen(false);
-      toast.success("You’re signed out. See you next time.");
+      setDropdownOpen(false);
+      toast.success("Logged out successfully");
       router.push("/");
-    } catch (error) {
-      toast.error(error.message);
+    } catch (err) {
+      toast.error(err.message || "Failed to logout");
     }
   }
 
   return (
     <header className="site-header">
       <div className="header-inner">
-        <Link className="brand" href="/" aria-label="StudioSpace home">
+        <Link className="brand" href="/" aria-label="StudioSpace">
           <span className="brand-mark">
-            <Aperture size={23} strokeWidth={2.2} />
+            <Aperture size={22} strokeWidth={2.2} />
           </span>
           <span>
             studio<span className="brand-light">space</span>
           </span>
         </Link>
-        <nav
-          className={`main-nav ${menuOpen ? "is-open" : ""}`}
-          aria-label="Main navigation"
-        >
-          {links.map(([label, href]) => (
-            <Link key={label} href={href} onClick={() => setMenuOpen(false)}>
-              {label}
-            </Link>
-          ))}
-          {user && (
-            <Link
-              className="mobile-host-link"
-              href="/add-studio"
-              onClick={() => setMenuOpen(false)}
-            >
-              <Plus size={16} /> Host a space
-            </Link>
-          )}
-          {user && (
-            <button className="mobile-logout" onClick={logout}>
-              <LogOut size={15} /> Sign out
-            </button>
+
+        <nav className={`main-nav ${menuOpen ? "is-open" : ""}`}>
+          <Link
+            href="/"
+            className={isActive("/") ? "active" : ""}
+            onClick={() => setMenuOpen(false)}
+          >
+            Home
+          </Link>
+          <Link
+            href="/studios"
+            className={isActive("/studios") ? "active" : ""}
+            onClick={() => setMenuOpen(false)}
+          >
+            Explore Studios
+          </Link>
+          <Link href="/#how-it-works" onClick={() => setMenuOpen(false)}>
+            How It Works
+          </Link>
+          <Link href="/#about-us" onClick={() => setMenuOpen(false)}>
+            About Us
+          </Link>
+
+          {user ? (
+            <>
+              <Link
+                className="mobile-nav-link"
+                href="/my-listings"
+                onClick={() => setMenuOpen(false)}
+              >
+                Dashboard
+              </Link>
+              <Link
+                className="mobile-nav-link"
+                href="/add-studio"
+                onClick={() => setMenuOpen(false)}
+              >
+                <Plus size={15} /> Add New Studio
+              </Link>
+              <Link
+                className="mobile-nav-link"
+                href="/my-listings"
+                onClick={() => setMenuOpen(false)}
+              >
+                My Studio Listings
+              </Link>
+              <Link
+                className="mobile-nav-link"
+                href="/my-bookings"
+                onClick={() => setMenuOpen(false)}
+              >
+                My Bookings
+              </Link>
+              <button className="mobile-logout" onClick={handleLogout}>
+                <LogOut size={15} /> Logout
+              </button>
+            </>
+          ) : (
+            <div className="mobile-auth-row">
+              <Link
+                className="button button-outline button-small"
+                href="/login"
+                onClick={() => setMenuOpen(false)}
+              >
+                Login
+              </Link>
+              <Link
+                className="button button-dark button-small"
+                href="/register"
+                onClick={() => setMenuOpen(false)}
+              >
+                Register
+              </Link>
+            </div>
           )}
         </nav>
+
         <div className="header-actions">
           <button
             className="icon-button theme-toggle"
             onClick={toggleTheme}
-            aria-label={`Switch to ${theme === "light" ? "dark" : "light"} theme`}
+            aria-label="Toggle theme"
           >
             {theme === "light" ? <Moon size={18} /> : <Sun size={18} />}
           </button>
+
           {!authLoading &&
             (user ? (
               <>
                 <Link className="host-link" href="/add-studio">
                   <Plus size={16} /> Host a space
                 </Link>
-                <Link
-                  className="avatar-link"
-                  href="/profile"
-                  title="Profile settings"
+
+                <div
+                  className="user-menu"
+                  onMouseEnter={() => setDropdownOpen(true)}
+                  onMouseLeave={() => setDropdownOpen(false)}
                 >
-                  {user.photoURL ? (
-                    <img src={user.photoURL} alt="" />
-                  ) : (
-                    user.name?.slice(0, 1).toUpperCase()
+                  <button
+                    type="button"
+                    className="avatar-button"
+                    onClick={() => setDropdownOpen(!dropdownOpen)}
+                  >
+                    {user.photoURL ? (
+                      <img src={user.photoURL} alt={user.name || "User"} />
+                    ) : (
+                      user.name?.slice(0, 1).toUpperCase() || "U"
+                    )}
+                  </button>
+
+                  {dropdownOpen && (
+                    <div className="user-dropdown">
+                      <div className="dropdown-user">
+                        <strong>{user.name}</strong>
+                        <small>{user.email}</small>
+                      </div>
+                      <Link
+                        href="/my-listings"
+                        onClick={() => setDropdownOpen(false)}
+                      >
+                        Dashboard
+                      </Link>
+                      <Link
+                        href="/add-studio"
+                        onClick={() => setDropdownOpen(false)}
+                      >
+                        Add New Studio
+                      </Link>
+                      <Link
+                        href="/my-listings"
+                        onClick={() => setDropdownOpen(false)}
+                      >
+                        My Studio Listings
+                      </Link>
+                      <Link
+                        href="/my-bookings"
+                        onClick={() => setDropdownOpen(false)}
+                      >
+                        My Bookings
+                      </Link>
+                      <button
+                        className="dropdown-logout"
+                        onClick={handleLogout}
+                      >
+                        <LogOut size={14} /> Logout
+                      </button>
+                    </div>
                   )}
-                </Link>
-                <button
-                  className="logout-button"
-                  onClick={logout}
-                  aria-label="Sign out"
-                >
-                  <LogOut size={17} />
-                </button>
+                </div>
               </>
             ) : (
-              <Link className="button button-dark header-login" href="/login">
-                Log in
-              </Link>
+              <div className="header-auth-buttons">
+                <Link
+                  className="button button-outline header-btn"
+                  href="/login"
+                >
+                  Login
+                </Link>
+                <Link
+                  className="button button-dark header-btn"
+                  href="/register"
+                >
+                  Register
+                </Link>
+              </div>
             ))}
+
           <button
             className="icon-button menu-button"
             onClick={() => setMenuOpen(!menuOpen)}
-            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            aria-label="Menu"
           >
             {menuOpen ? <X size={21} /> : <Menu size={21} />}
           </button>
