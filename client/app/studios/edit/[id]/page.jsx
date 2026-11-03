@@ -65,7 +65,7 @@ function EditStudioContent() {
         key={studioId(studio)}
         initialValue={studio}
         onSubmit={save}
-        submitLabel="Save your changes"
+        submitLabel="Save Changes"
       />
     </div>
   );

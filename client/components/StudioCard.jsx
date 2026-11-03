@@ -52,6 +52,7 @@ export function StudioCard({ studio, onUnsave }) {
         type="button"
         onClick={toggleSaved}
         disabled={saving}
+        title={isSaved ? "Saved in wishlist" : "Save to wishlist"}
         aria-label={
           isSaved
             ? `Remove ${studio.title} from saved studios`

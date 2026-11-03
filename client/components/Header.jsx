@@ -130,6 +130,13 @@ export function Header() {
               >
                 My Bookings
               </Link>
+              <Link
+                className="mobile-nav-link"
+                href="/saved-studios"
+                onClick={() => setMenuOpen(false)}
+              >
+                Saved Studios
+              </Link>
               <button className="mobile-logout" onClick={handleLogout}>
                 <LogOut size={15} /> Logout
               </button>
@@ -217,6 +224,12 @@ export function Header() {
                         onClick={() => setDropdownOpen(false)}
                       >
                         My Bookings
+                      </Link>
+                      <Link
+                        href="/saved-studios"
+                        onClick={() => setDropdownOpen(false)}
+                      >
+                        Saved Studios
                       </Link>
                       <button
                         className="dropdown-logout"

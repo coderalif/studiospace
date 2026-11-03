@@ -46,10 +46,7 @@ export default function AddStudioPage() {
             SOME ROOM
           </span>
         </div>
-        <StudioForm
-          onSubmit={createStudio}
-          submitLabel="Publish your listing"
-        />
+        <StudioForm onSubmit={createStudio} submitLabel="Save Studio" />
       </div>
     </RequireAuth>
   );

@@ -2393,6 +2393,16 @@ em {
   justify-content: space-between;
   margin-top: 22px;
 }
+.save-detail-btn {
+  width: 100%;
+  margin-top: 10px;
+  justify-content: center;
+  gap: 8px;
+}
+.save-detail-btn.is-saved {
+  color: var(--danger);
+  border-color: var(--danger);
+}
 .booking-safe-note {
   display: flex;
   justify-content: center;

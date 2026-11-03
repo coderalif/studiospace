@@ -9,6 +9,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Clock3,
+  Heart,
   MapPin,
   ShieldCheck,
   Star,
@@ -201,12 +202,36 @@ function ReviewForm({ studio, onDone }) {
 function StudioDetails() {
   const { id } = useParams();
   const router = useRouter();
-  const { user, authLoading } = useAuth();
+  const { user, setUser, authLoading } = useAuth();
   const [studio, setStudio] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [bookingOpen, setBookingOpen] = useState(false);
   const [activeImage, setActiveImage] = useState(0);
+  const [savingWishlist, setSavingWishlist] = useState(false);
+  const isSaved = user?.savedStudios?.includes(id) || false;
+
+  async function toggleSaved() {
+    if (!user) {
+      router.push(`/login?next=${encodeURIComponent(`/studios/${id}`)}`);
+      return;
+    }
+    setSavingWishlist(true);
+    try {
+      const result = await api(`/studios/${id}/saved`, {
+        method: isSaved ? "DELETE" : "PUT",
+      });
+      setUser((currentUser) => ({
+        ...currentUser,
+        savedStudios: result.savedStudios,
+      }));
+      toast.success(result.message);
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setSavingWishlist(false);
+    }
+  }
 
   useEffect(() => {
     api(`/studios/${id}`)
@@ -423,18 +448,29 @@ function StudioDetails() {
                 Manage your listing <ArrowRight size={16} />
               </Link>
             ) : (
-              <button
-                className="button button-dark booking-cta"
-                onClick={() =>
-                  user
-                    ? setBookingOpen(true)
-                    : router.push(
-                        `/login?next=${encodeURIComponent(`/studios/${id}`)}`,
-                      )
-                }
-              >
-                Book Workspace Now <ArrowRight size={16} />
-              </button>
+              <>
+                <button
+                  className="button button-dark booking-cta"
+                  onClick={() =>
+                    user
+                      ? setBookingOpen(true)
+                      : router.push(
+                          `/login?next=${encodeURIComponent(`/studios/${id}`)}`,
+                        )
+                  }
+                >
+                  Book Workspace Now <ArrowRight size={16} />
+                </button>
+                <button
+                  type="button"
+                  className={`button button-outline save-detail-btn ${isSaved ? "is-saved" : ""}`}
+                  onClick={toggleSaved}
+                  disabled={savingWishlist}
+                >
+                  <Heart size={16} fill={isSaved ? "currentColor" : "none"} />
+                  {isSaved ? "Saved in Wishlist" : "Save to Wishlist"}
+                </button>
+              </>
             )}
             <p className="booking-safe-note">
               <ShieldCheck size={14} /> No charge until your host confirms.
