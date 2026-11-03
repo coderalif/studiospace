@@ -366,15 +366,10 @@ em {
 .dropdown-logout:hover {
   background: rgba(220, 38, 38, 0.08);
 }
-.mobile-auth-row {
-  display: flex;
-  gap: 8px;
-  margin-top: 8px;
-}
-.mobile-nav-link {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+.mobile-auth-row,
+.mobile-nav-link,
+.mobile-logout {
+  display: none;
 }
 .header-login {
   min-height: 40px;
@@ -416,9 +411,6 @@ em {
 .logout-button:hover {
   color: var(--ink);
   background: var(--surface-soft);
-}
-.mobile-logout {
-  display: none;
 }
 
 /* Home page: image slider, featured studios, categories, and host callout. */
@@ -2864,10 +2856,16 @@ em {
     border-bottom: 1px solid var(--line);
     font-size: 13px;
   }
-  .main-nav .mobile-host-link {
+  .main-nav .mobile-host-link,
+  .main-nav .mobile-nav-link {
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 6px;
+  }
+  .main-nav .mobile-auth-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
   }
   .main-nav .mobile-logout {
     display: flex;

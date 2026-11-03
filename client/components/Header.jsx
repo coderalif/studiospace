@@ -162,6 +162,12 @@ export function Header() {
         </nav>
 
         <div className="header-actions">
+          {!authLoading && user && (
+            <Link className="host-link" href="/add-studio">
+              <Plus size={16} /> Host a space
+            </Link>
+          )}
+
           <button
             className="icon-button theme-toggle"
             onClick={toggleTheme}
@@ -172,75 +178,66 @@ export function Header() {
 
           {!authLoading &&
             (user ? (
-              <>
-                <Link className="host-link" href="/add-studio">
-                  <Plus size={16} /> Host a space
-                </Link>
-
-                <div
-                  className="user-menu"
-                  ref={dropdownRef}
-                  onMouseEnter={handleMouseEnter}
-                  onMouseLeave={handleMouseLeave}
+              <div
+                className="user-menu"
+                ref={dropdownRef}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+              >
+                <button
+                  type="button"
+                  className="avatar-button"
+                  onClick={handleAvatarClick}
                 >
-                  <button
-                    type="button"
-                    className="avatar-button"
-                    onClick={handleAvatarClick}
-                  >
-                    {user.photoURL ? (
-                      <img src={user.photoURL} alt={user.name || "User"} />
-                    ) : (
-                      user.name?.slice(0, 1).toUpperCase() || "U"
-                    )}
-                  </button>
-
-                  {dropdownOpen && (
-                    <div className="user-dropdown">
-                      <div className="dropdown-user">
-                        <strong>{user.name}</strong>
-                        <small>{user.email}</small>
-                      </div>
-                      <Link
-                        href="/my-listings"
-                        onClick={() => setDropdownOpen(false)}
-                      >
-                        Dashboard
-                      </Link>
-                      <Link
-                        href="/add-studio"
-                        onClick={() => setDropdownOpen(false)}
-                      >
-                        Add New Studio
-                      </Link>
-                      <Link
-                        href="/my-listings"
-                        onClick={() => setDropdownOpen(false)}
-                      >
-                        My Studio Listings
-                      </Link>
-                      <Link
-                        href="/my-bookings"
-                        onClick={() => setDropdownOpen(false)}
-                      >
-                        My Bookings
-                      </Link>
-                      <Link
-                        href="/saved-studios"
-                        onClick={() => setDropdownOpen(false)}
-                      >
-                        Saved Studios
-                      </Link>
-                      <button
-                        className="dropdown-logout"
-                        onClick={handleLogout}
-                      >
-                        <LogOut size={14} /> Logout
-                      </button>
-                    </div>
+                  {user.photoURL ? (
+                    <img src={user.photoURL} alt={user.name || "User"} />
+                  ) : (
+                    user.name?.slice(0, 1).toUpperCase() || "U"
                   )}
-                </div>
-              </>
+                </button>
+
+                {dropdownOpen && (
+                  <div className="user-dropdown">
+                    <div className="dropdown-user">
+                      <strong>{user.name}</strong>
+                      <small>{user.email}</small>
+                    </div>
+                    <Link
+                      href="/my-listings"
+                      onClick={() => setDropdownOpen(false)}
+                    >
+                      Dashboard
+                    </Link>
+                    <Link
+                      href="/add-studio"
+                      onClick={() => setDropdownOpen(false)}
+                    >
+                      Add New Studio
+                    </Link>
+                    <Link
+                      href="/my-listings"
+                      onClick={() => setDropdownOpen(false)}
+                    >
+                      My Studio Listings
+                    </Link>
+                    <Link
+                      href="/my-bookings"
+                      onClick={() => setDropdownOpen(false)}
+                    >
+                      My Bookings
+                    </Link>
+                    <Link
+                      href="/saved-studios"
+                      onClick={() => setDropdownOpen(false)}
+                    >
+                      Saved Studios
+                    </Link>
+                    <button className="dropdown-logout" onClick={handleLogout}>
+                      <LogOut size={14} /> Logout
+                    </button>
+                  </div>
+                )}
+              </div>
             ) : (
               <div className="header-auth-buttons">
                 <Link
