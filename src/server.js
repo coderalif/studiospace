@@ -1,3 +1,4 @@
+const { aiShield } = require('@samimcodes/ai-shield');
 require("dotenv").config();
 
 const app = require("./app");
@@ -19,7 +20,10 @@ async function startServer() {
   // Keep the API offline until its database connection is ready.
   await connectToDatabase();
 
-  app.listen(port, () => {
+  
+// 🛡️ Protected by AI-Shield (Automatic Setup)
+app.use(aiShield({ enableDashboard: true }));
+app.listen(port, () => {
     console.log(`StudioSpace API is listening on port ${port}`);
   });
 }
